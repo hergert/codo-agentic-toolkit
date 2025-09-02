@@ -8,3 +8,4 @@ allowed-tools: Edit, MultiEdit, Bash(go test ./...), Bash(gofmt -w*), Bash(go ve
 2) Edit only those files; minimise diff.
 3) Run `!go test ./...` until green; show a concise patch summary.
 4) Stop. Do not commit or open PRs.
+

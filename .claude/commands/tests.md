@@ -10,3 +10,4 @@ allowed-tools: Edit, Bash(go test ./...), Bash(go test -run*)
    - Stays fast: no network unless mocked; isolate global state.
 2) Create/modify only the planned `*_test.go` files.
 3) Run `!go test ./...`; summarize failures; avoid fixing unrelated code unless the plan requires it (YAGNI).
+

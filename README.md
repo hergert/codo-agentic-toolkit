@@ -1,30 +1,29 @@
-# Codo Agentic Toolkit (Claude Code)
+# Codo Agentic Toolkit (Claude Code) — v4 Complete
 
-Drop this folder into the root of your repo. It provides:
-- `.claude/commands/*.md` — reusable slash commands for spec → plan → implement → verify loops
-- `.claude/hooks.json` — deterministic guardrails (block sensitive edits, auto-format after edits)
-- `.claude/settings.json` — baseline permission patterns (tune to your stack)
-- `.claude/output-styles/*.md` — optional Planner/Reviewer system styles
-- `CLAUDE.md` — project memory (norms, paths, workflow)
+Drop this folder into your repo root. It provides:
+- Subagents (`.claude/agents/*.yaml`) for mapping, tests, and review (separate contexts)
+- Commands (`.claude/commands/*.md`) for a tight loop: map → plan → prime → tests → implement → review
+- Hooks (`.claude/hooks.json`) as seatbelts (edit gating, formatters, commit/prod deploy blocks, rm -rf block)
+- Settings (`.claude/settings.json`) plan-by-default; liberal read/test; ask on edits/commits
+- Output styles (`.claude/output-styles/*`) to switch personas fast
+- Templates (spec, job card, commit message)
 
 ## Quick Start
 1) Open a terminal in your repo.
 2) Run `claude` to start interactive mode.
-3) Daily usage (tight loop):
-   - `/map-feature "<key>"` → evidence-backed map
-   - `/plan-tight "<key>"` → lean plan (files, pseudo‑code, tests, risks)
-   - `/prime-context "<key>"` → pin context; then `/sanity-check`
-   - Review → `/approve-plan "<key>"` to unlock source edits (auto‑plan gate)
-   - `/write-tests-contract "<key>"` → contract-level tests
-   - `/implement-diff-min "<key>"` → smallest change to green
-   - `/review-diff "<key>"` → crisp decision
-   - Optional: `/parallel-worktrees "<key>" 3` to explore variants; use `/context-slim` to keep tokens lean
-   - Note: commit/PR/deploy blocked by policy; you run them explicitly.
+3) Quick Start
+   - `claude` → `/output-style surgical`
+   - `/feature-sprint "<key>"` → map + plan + prime
+   - Review → `/approve "<key>"` or `/fast-on` (optional `commits`)
+   - `/tests "<key>"` → value-dense tests
+   - `/implement "<key>"` → smallest change to green
+   - `/review "<key>"`
+   - (Optional) `/prepare-commit` (requires `ALLOW_COMMITS` or `FAST_MODE`)
 
-## Safety
-- Auto‑plan: source edits require `.claude/session/ALLOW_EDITS` marker; docs and `.claude/` remain writable.
-- Hooks block sensitive writes and deny commits/PR merges/prod deploys; adjust in `.claude/hooks.json`.
-- Settings default to plan‑mode; see `.claude/settings.json`.
+## Notes
+- Commits/PR merges are gated by hooks (require `.claude/session/ALLOW_COMMITS` or Fast Mode).
+- Production deploys require explicit marker `.claude/session/ALLOW_PROD_DEPLOY`.
+- Use subagents with job cards in `docs/tasks/` to keep context clean.
 
 ## Tuning
 - Update `CLAUDE.md` with your real scripts/paths.

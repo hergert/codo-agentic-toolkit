@@ -1,0 +1,16 @@
+name: reader
+description: >
+  Map code paths & contracts. Use PROACTIVELY when a task references unfamiliar files/routes.
+  MUST BE USED before edits in unknown areas.
+tools:
+  - Read
+  - Bash
+model: sonnet
+deliverable: docs/results/{{key}}.reader.md
+output: |
+  - Contracts (handlers/CLI), file paths + line spans
+  - Data flows (DB, queues, external APIs)
+  - Existing tests covering these paths
+  - 5–8 acceptance checks to verify behavior
+  - Open questions (TODO(human))
+
