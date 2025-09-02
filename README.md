@@ -9,10 +9,9 @@ Drop this folder into your repo root. It provides:
 - Templates (spec, job card, commit message)
 
 ## Quick Start
-1) Open a terminal in your repo.
-2) Run `claude` to start interactive mode.
-3) Quick Start
-   - `claude` → `/output-style surgical`
+1) Open a terminal in your repo and run `claude`.
+2) Then use:
+   - `/output-style surgical`
    - `/feature-sprint "<key>"` → map + plan + prime
    - Review → `/approve "<key>"` or `/fast-on` (optional `commits`)
    - `/tests "<key>"` → value-dense tests

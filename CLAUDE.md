@@ -1,4 +1,5 @@
 # CLAUDE.md (project memory)
+Project Tag: CODO-ANCHOR
 
 ## GOLDEN RULES – Read first, enforce always
 1. YAGNI – Write only what the current ticket/spec demands.

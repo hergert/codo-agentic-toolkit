@@ -1,0 +1,9 @@
+[
+  {
+    "matcher": "Bash(go generate*)",
+    "hooks": [
+      { "type": "command", "command": "bash -lc 'echo \"⚠️ go generate can be broad; ensure it is scoped.\"; exit 0'" }
+    ]
+  }
+]
+

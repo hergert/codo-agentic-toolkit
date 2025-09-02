@@ -1,42 +1,14 @@
 {
+  "UserPromptSubmit": [
+    { "hooks": [ { "type": "command", "command": "python3 .claude/hooks/user_prompt_submit.py" } ] }
+  ],
   "PreToolUse": [
-    {
-      "matcher": "Edit|MultiEdit|Write",
-      "hooks": [{
-        "type": "command",
-        "command": "python3 - <<'PY'\nimport json,sys,os\nE=json.load(sys.stdin)\np=(E.get('tool_input') or {}).get('file_path','') or ''\n# Permit docs/.claude edits always\nif p.startswith('docs/') or p.startswith('.claude/'): sys.exit(0)\n# Require approval or Fast Mode for source edits\nfast=os.path.exists('.claude/session/FAST_MODE')\napproved=os.path.exists('.claude/session/ALLOW_EDITS')\nif not (fast or approved):\n  print('✋ Edits blocked: run /approve <task> or /fast-on')\n  sys.exit(2)\n# Block sensitive targets\nfor bad in ('.env','/package-lock.json','/pnpm-lock.yaml','/yarn.lock','/.git/'):\n  if bad in p:\n    print('✋ Blocked write:', p)\n    sys.exit(2)\nsys.exit(0)\nPY"
-      }]
-    },
-    {
-      "matcher": "Bash(rm -rf*)",
-      "hooks": [{ "type": "command", "command": "bash -lc 'echo \"✋ rm -rf blocked. Use manual approval.\"; exit 2'" }]
-    },
-    {
-      "matcher": "Bash(git commit*)|Bash(gh pr create*)|Bash(gh pr merge*)",
-      "hooks": [{ "type": "command", "command": "bash -lc 'if [ ! -f .claude/session/ALLOW_COMMITS ] && [ ! -f .claude/session/FAST_MODE ]; then echo \"✋ commits/PR merges are human-only (use /fast-on commits or set ALLOW_COMMITS)\"; exit 2; fi'" }]
-    },
-    {
-      "matcher": "Bash(npx wrangler deploy --env production*)|Bash(wrangler deploy --env production*)",
-      "hooks": [{ "type": "command", "command": "bash -lc 'if [ ! -f .claude/session/ALLOW_PROD_DEPLOY ]; then echo \"✋ production deploy blocked. Create .claude/session/ALLOW_PROD_DEPLOY to proceed.\"; exit 2; fi'" }]
-    }
+    { "matcher": "*", "hooks": [ { "type": "command", "command": "python3 .claude/hooks/pre_tool_use.py" } ] }
   ],
   "PostToolUse": [
-    {
-      "matcher": "Edit|MultiEdit|Write",
-      "hooks": [{
-        "type": "command",
-        "command": "python3 - <<'PY'\nimport json,sys,subprocess,shlex\ne=json.load(sys.stdin); f=e.get('tool_input',{}).get('file_path','') or ''\nfmt=None\nif f.endswith('.go'): fmt=f'go fmt {shlex.quote(f)}'\nelif f.endswith(('.ts','.tsx','.js','.jsx')): fmt=f'npx prettier --write {shlex.quote(f)}'\nif fmt: subprocess.call(fmt, shell=True)\nprint('[format] done:', f)\nPY"
-      }]
-    },
-    {
-      "matcher": "Edit|MultiEdit|Write",
-      "hooks": [{
-        "type": "command",
-        "command": "bash -lc 'git diff --shortstat || true'"
-      }]
-    }
+    { "matcher": "Edit|MultiEdit|Write", "hooks": [ { "type": "command", "command": "python3 .claude/hooks/post_tool_use.py" } ] }
   ],
   "Notification": [
-    {"matcher": "Stop|SubagentStop", "hooks": [{"type": "command", "command": "echo '[Claude] Exit gate: go test ./... | Commits/deploys are user-only.'"}]}
+    { "matcher": "Stop|SubagentStop", "hooks": [ { "type": "command", "command": "echo '[Claude] Gates → edits: ALLOW_EDITS/FAST_MODE | commits: ALLOW_COMMITS/FAST_MODE | prod: ALLOW_PROD_DEPLOY | DB: ALLOW_DB_MIGRATE | mobile: ALLOW_MOBILE_RELEASE'" } ] }
   ]
 }

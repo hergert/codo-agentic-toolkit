@@ -1,0 +1,9 @@
+[
+  {
+    "matcher": "Bash(fastlane*)|Bash(flutter build ipa*)|Bash(flutter build appbundle*)",
+    "hooks": [
+      { "type": "command", "command": "bash -lc 'if [ ! -f .claude/session/ALLOW_MOBILE_RELEASE ]; then echo \"✋ mobile release blocked (set ALLOW_MOBILE_RELEASE)\"; exit 2; fi'" }
+    ]
+  }
+]
+
