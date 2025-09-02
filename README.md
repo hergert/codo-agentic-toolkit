@@ -10,24 +10,24 @@ Drop this folder into the root of your repo. It provides:
 ## Quick Start
 1) Open a terminal in your repo.
 2) Run `claude` to start interactive mode.
-3) Use these commands:
-   - `/plan-feature "<feature>"` → spec + diff plan
-   - `/design-spec "<issue>"` → acceptance-test-first spec
-   - `/implement-diff "<feature>"` → tests first + minimal code
-   - `/fix-tests` → minimal fixes to get green
-   - `/review-diff "<feature>"` → review staged changes
-   - `/ship` → open PR once tests are green
-   - `/compact` → summarize & trim context
+3) Daily usage (tight loop):
+   - `/map-feature "<feature>"` → evidence-backed map
+   - `/plan-tight "<feature>"` → minimal, file-explicit plan
+   - `/prime-context "<feature>"` → snapshot and pin context
+   - Get approval
+   - `/write-tests-contract "<feature>"` → add contract-level tests
+   - `/implement-diff-min "<feature>"` → smallest change to green
+   - `/review-diff "<feature>"` → reviewer checklist
+   - Note: commit/PR/deploy are blocked by policy; you run them explicitly.
 
 ## Safety
-- Hooks block writes to `.env`, `.git/`, and `package-lock.json`; adjust in `.claude/hooks.json`.
-- Permissions ask before builds or pushes; see `.claude/settings.json`.
+- Hooks block sensitive writes and deny commits/PR merges/prod deploys; adjust in `.claude/hooks.json`.
+- Settings default to plan-mode; source edits ask; commits/PRs are denied; see `.claude/settings.json`.
 
 ## Tuning
 - Update `CLAUDE.md` with your real scripts/paths.
 - Extend `allowed-tools` per command for your stack.
 - Consider enabling a custom output style: `/output-style ~/.claude/output-styles/planner.md`.
 
-## Pack V1 Docs
-- Setup and usage: `docs/claude-pack-v1.md`
-- Knowledge base (general, repo‑agnostic): `docs/knowledge-base.md`
+## Knowledge Base
+- Principles and best practices (repo‑agnostic): `docs/knowledge-base.md`

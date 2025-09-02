@@ -1,19 +1,21 @@
 {
   "defaultMode": "plan",
-  "additionalDirectories": ["docs", "scripts", ".github"],
+  "additionalDirectories": ["docs", ".claude", "scripts", ".github"],
   "rules": [
-    { "tool": "Edit|Write|MultiEdit", "scope": "src/**|tests/**", "policy": "ask" },
-    { "tool": "Edit|Write|MultiEdit", "scope": "package.json|pyproject.toml|go.mod", "policy": "ask" },
-    { "tool": "Edit|Write|MultiEdit", "scope": "**/*.env|**/.env|**/.git/**|**/package-lock.json|**/pnpm-lock.yaml|**/yarn.lock|**/.github/**|**/deploy/**", "policy": "deny" },
+    { "tool": "Edit|Write|MultiEdit", "scope": "docs/**|.claude/**", "policy": "allow" },
 
-    { "tool": "Bash(npm test*)|Bash(pnpm test*)|Bash(uv run pytest*)|Bash(pytest*)|Bash(go test*)", "policy": "allow" },
-    { "tool": "Bash(npm run build*)|Bash(pnpm build*)|Bash(uv run *)|Bash(pip install*)|Bash(pnpm install*)", "policy": "ask" },
+    { "tool": "Edit|Write|MultiEdit", "scope": "tests/**|*_test.go|**/*_test.go", "policy": "ask" },
+    { "tool": "Edit|Write|MultiEdit", "scope": "src/**|internal/**|cmd/**|pkg/**|**/*.go|**/*.ts|**/*.tsx|**/*.py|**/*.js|**/*.jsx", "policy": "ask" },
 
-    { "tool": "Bash(git status*)|Bash(git diff*)|Bash(git add*)|Bash(git restore --staged*)|Bash(git checkout*)|Bash(git switch*)", "policy": "allow" },
-    { "tool": "Bash(git commit -m*)|Bash(git tag*)", "policy": "ask" },
+    { "tool": "Edit|Write|MultiEdit", "scope": "**/.env|**/.git/**|**/package-lock.json|**/pnpm-lock.yaml|**/yarn.lock|**/node_modules/**|**/deploy/**", "policy": "deny" },
 
-    { "tool": "Bash(gh pr create*)|Bash(gh pr view*)|Bash(gh pr status*)|Bash(gh pr merge*)", "policy": "ask" }
+    { "tool": "Bash(go test ./*)|Bash(go test -run*)|Bash(gofmt -w*)|Bash(go vet*)", "policy": "allow" },
+    { "tool": "Bash(git status*)|Bash(git diff*)|Bash(git grep*)|Bash(find *)", "policy": "allow" },
+
+    { "tool": "Bash(npx wrangler deploy --env production*)|Bash(wrangler deploy --env production*)", "policy": "deny" },
+    { "tool": "Bash(npx wrangler deploy*)|Bash(wrangler deploy*)|Bash(npx wrangler dev*)", "policy": "ask" },
+
+    { "tool": "Bash(git commit*)|Bash(git tag*)|Bash(gh pr create*)|Bash(gh pr merge*)", "policy": "deny" }
   ],
-  "notes": "Plan mode by default. Escalate to acceptEdits only after /plan-feature or /design-spec is approved. Use /compact before long runs; run /cost to watch budget."
+  "notes": "Plan mode by default. Ask before any source edit. Commits/PRs are denied; user will do them. Production deploys denied. Always run contract tests via `go test ./...` as the exit gate."
 }
-

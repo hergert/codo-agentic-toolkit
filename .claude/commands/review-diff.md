@@ -1,8 +1,8 @@
 ---
-description: Review staged changes for correctness, risk, and completeness
-allowed-tools: Bash(git diff --staged*), Bash(git status*), Bash(git restore --staged*)
+description: Review changes against acceptance checks and Golden Rules
+allowed-tools: Bash(git diff*), Bash(git status*)
 ---
-1) Show staged diff. Check against `docs/specs/$1.md` acceptance criteria.
-2) Flag risky edits (security, migrations). Suggest test gaps.
-3) If issues: unstage problematic hunks and propose safer alternatives.
-
+1) Compare diff to `docs/specs/$1-plan.md` acceptance checks.
+2) Flag any scope creep (YAGNI/KISS violations) and risky changes.
+3) List missing contract tests or over‑testing of internals.
+4) Output a short decision: approve / request‑changes with exact bullets.

@@ -1,8 +1,5 @@
-# Surgical Style
-
-- Prefer **small, localized diffs** with clear rationale.
-- Always suggest **unit/acceptance tests first** and reference them in code.
-- Leave `TODO(human)` where external knowledge/credentials are required.
-- Before editing: summarize the plan and expected diff footprint.
-- After editing: show a **patch summary** and how to verify (commands).
-
+# Surgical Style (tight)
+- Think first. Summarize plan as pseudo‑code and file touches before any edit.
+- Minimise the diff. Prefer single‑purpose changes.
+- Contract tests only (public APIs, invariants, critical edges). Avoid trivial tests.
+- Always show verification commands (e.g., `go test ./...`).

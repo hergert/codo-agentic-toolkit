@@ -1,39 +1,30 @@
 {
   "PreToolUse": [
     {
-      "matcher": "Edit|MultiEdit|Write",
-      "hooks": [
-        {
-          "type": "command",
-          "command": "python3 - <<'PY'\nimport json,sys,os,fnmatch\ne=json.load(sys.stdin)\np=e.get('tool_input',{}).get('file_path','') or ''\nBLOCKERS=['.env','/package-lock.json','/pnpm-lock.yaml','/yarn.lock','/.git/']\nif any(b in p for b in BLOCKERS):\n  print('Blocked write to sensitive file:', p)\n  sys.exit(2)\nsys.exit(0)\nPY"
-        }
-      ]
+      "matcher": "Bash(git commit*)|Bash(gh pr create*)|Bash(gh pr merge*)|Bash(npx wrangler deploy --env production*)|Bash(wrangler deploy --env production*)",
+      "hooks": [{
+        "type": "command",
+        "command": "python3 - <<'PY'\nimport sys; print('❌ Blocked: commits/PR merges/prod deploys are disallowed by policy.'); sys.exit(2)\nPY"
+      }]
     },
     {
-      "matcher": "Bash(pip install*)|Bash(pnpm install*)|Bash(npm install*)",
-      "hooks": [
-        {
-          "type": "command",
-          "command": "echo 'Install blocked by default. Use human approval or sandbox.' ; exit 2"
-        }
-      ]
+      "matcher": "Edit|MultiEdit|Write",
+      "hooks": [{
+        "type": "command",
+        "command": "python3 - <<'PY'\nimport json,sys\ne=json.load(sys.stdin)\np=e.get('tool_input',{}).get('file_path','') or ''\nblockers=['.env','/package-lock.json','/pnpm-lock.yaml','/yarn.lock','/.git/']\nif any(b in p for b in blockers):\n  print('❌ Blocked write to sensitive file:', p); sys.exit(2)\nsys.exit(0)\nPY"
+      }]
     }
   ],
   "PostToolUse": [
     {
       "matcher": "Edit|MultiEdit|Write",
-      "hooks": [
-        { "type": "command", "command": "jq -r '.tool_input.file_path' | { read f; case \"$f\" in *.ts|*.tsx|*.js|*.jsx) npx prettier --write \"$f\" ;; *.py) uv run ruff check --fix \"$f\"; uv run black \"$f\" ;; *.go) go fmt \"$f\" ;; esac; }" }
-      ]
+      "hooks": [{
+        "type": "command",
+        "command": "python3 - <<'PY'\nimport json,sys,subprocess,shlex\ne=json.load(sys.stdin)\nf=e.get('tool_input',{}).get('file_path','') or ''\ncmd=None\nif f.endswith('.go'): cmd=f'go fmt {shlex.quote(f)}'\nelif f.endswith(('.ts','.tsx','.js','.jsx')): cmd=f'npx prettier --write {shlex.quote(f)}'\nif cmd: subprocess.call(cmd, shell=True)\nprint('[format] done:', f)\nPY"
+      }]
     }
   ],
   "Notification": [
-    {
-      "matcher": "SubagentStop|Stop",
-      "hooks": [
-        { "type": "command", "command": "echo '[Claude] Session ended. Ensure tests are green before /ship.'" }
-      ]
-    }
+    {"matcher": "Stop|SubagentStop", "hooks": [{"type": "command", "command": "echo '[Claude] Remember: exit gate is go test ./...; user handles commit/PR.'"}]}
   ]
 }
-
