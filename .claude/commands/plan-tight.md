@@ -2,6 +2,7 @@
 description: Tight, reviewable plan with explicit file touches; stop for approval
 allowed-tools: Edit
 ---
+Think deeply and enumerate trade‑offs. If the plan seems risky, keep thinking and propose safer alternatives before edits.
 # Input: $1 = feature/task key
 
 1) Create `docs/specs/$1-plan.md` with only essentials:
