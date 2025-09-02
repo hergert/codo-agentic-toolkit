@@ -10,7 +10,7 @@ allowed-tools: Edit, Bash(git grep*), Bash(git diff*), Bash(find *), Bash(go tes
    - UX/UI flow: user steps & states; validation/errors/timeouts.
    - Files & entry points: exact paths with line spans (use `git grep -n`/`find`).
    - Data & side‑effects: DB tables, external APIs, queues, flags.
-   - Existing tests: list `*_test.go` that hit these contracts and what they assert.
+   - Existing tests: list the files/specs covering these contracts (e.g., `*_test.go`, `*.spec.ts`, `test_*.py`, `*Test.java`) and what they assert.
    - Invariants & risky edges we must preserve.
    - Open questions as TODO(human).
 3) No source edits. Output a one‑screen TL;DR.

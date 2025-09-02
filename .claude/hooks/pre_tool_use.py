@@ -30,18 +30,18 @@ if any(b in path for b in BLOCK):
     print(f"✋ blocked write to sensitive: {path}", file=sys.stderr)
     sys.exit(2)
 
-# rm -rf guard (allow only inside trees/)
+# rm -rf guard (allow only inside trees/ for ALL targets)
 if tool.startswith("Bash(") and "rm -rf" in cmd:
     parts = shlex.split(cmd)
-    target = parts[2] if len(parts) >= 3 else ""
-    if not (target.startswith("trees/") and ".." not in target):
-        print("✋ rm -rf blocked (use git worktree remove or restrict to trees/)", file=sys.stderr)
+    targets = [p for p in parts if not p.startswith("-") and p not in ("rm",)]
+    if not targets or not all(t.startswith("trees/") and ".." not in t for t in targets):
+        print("✋ rm -rf blocked (restrict to trees/ or use git worktree remove)", file=sys.stderr)
         sys.exit(2)
 
-# Commit/PR gate
-if tool.startswith("Bash(git commit") or tool.startswith("Bash(gh pr "):
+# Commit/PR/tag gate
+if tool.startswith("Bash(git commit") or tool.startswith("Bash(gh pr ") or tool.startswith("Bash(git tag"):
     if not (fast or os.path.exists(".claude/session/ALLOW_COMMITS")):
-        print("✋ commits/PR merges are human-only (use /fast-on commits or set ALLOW_COMMITS)", file=sys.stderr)
+        print("✋ commits/tags/PR merges are human-only (use /fast-on commits or set ALLOW_COMMITS)", file=sys.stderr)
         sys.exit(2)
 
 # Cloudflare Workers production deploy gate
@@ -69,4 +69,3 @@ if cmd.startswith("fastlane") or cmd.startswith("flutter build ipa") or cmd.star
         sys.exit(2)
 
 sys.exit(0)
-
