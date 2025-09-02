@@ -4,18 +4,14 @@
   "rules": [
     { "tool": "Edit|Write|MultiEdit", "scope": "docs/**|.claude/**", "policy": "allow" },
 
-    { "tool": "Edit|Write|MultiEdit", "scope": "tests/**|*_test.go|**/*_test.go", "policy": "ask" },
-    { "tool": "Edit|Write|MultiEdit", "scope": "src/**|internal/**|cmd/**|pkg/**|**/*.go|**/*.ts|**/*.tsx|**/*.py|**/*.js|**/*.jsx", "policy": "ask" },
-
+    { "tool": "Edit|Write|MultiEdit", "scope": "**/*.go|**/*.ts|**/*.tsx|**/*.py|**/*.js|**/*.jsx|src/**|internal/**|cmd/**|pkg/**", "policy": "ask" },
     { "tool": "Edit|Write|MultiEdit", "scope": "**/.env|**/.git/**|**/package-lock.json|**/pnpm-lock.yaml|**/yarn.lock|**/node_modules/**|**/deploy/**", "policy": "deny" },
 
-    { "tool": "Bash(go test ./*)|Bash(go test -run*)|Bash(gofmt -w*)|Bash(go vet*)", "policy": "allow" },
-    { "tool": "Bash(git status*)|Bash(git diff*)|Bash(git grep*)|Bash(find *)", "policy": "allow" },
+    { "tool": "Bash(go test ./...)|Bash(go test -run*)|Bash(gofmt -w*)|Bash(go vet*)|Bash(git status*)|Bash(git diff*)|Bash(git grep*)|Bash(find *)", "policy": "allow" },
 
+    { "tool": "Bash(git commit*)|Bash(git tag*)|Bash(gh pr create*)|Bash(gh pr merge*)", "policy": "deny" },
     { "tool": "Bash(npx wrangler deploy --env production*)|Bash(wrangler deploy --env production*)", "policy": "deny" },
-    { "tool": "Bash(npx wrangler deploy*)|Bash(wrangler deploy*)|Bash(npx wrangler dev*)", "policy": "ask" },
-
-    { "tool": "Bash(git commit*)|Bash(git tag*)|Bash(gh pr create*)|Bash(gh pr merge*)", "policy": "deny" }
+    { "tool": "Bash(npx wrangler deploy*)|Bash(wrangler deploy*)|Bash(npx wrangler dev*)", "policy": "ask" }
   ],
-  "notes": "Plan mode by default. Ask before any source edit. Commits/PRs are denied; user will do them. Production deploys denied. Always run contract tests via `go test ./...` as the exit gate."
+  "notes": "Auto‑plan: source edits require .claude/session/ALLOW_EDITS marker. Commits/PR merges/prod deploys blocked. Exit gate is `go test ./...` green."
 }

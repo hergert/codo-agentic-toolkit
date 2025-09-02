@@ -11,18 +11,20 @@ Drop this folder into the root of your repo. It provides:
 1) Open a terminal in your repo.
 2) Run `claude` to start interactive mode.
 3) Daily usage (tight loop):
-   - `/map-feature "<feature>"` → evidence-backed map
-   - `/plan-tight "<feature>"` → minimal, file-explicit plan
-   - `/prime-context "<feature>"` → snapshot and pin context
-   - Get approval
-   - `/write-tests-contract "<feature>"` → add contract-level tests
-   - `/implement-diff-min "<feature>"` → smallest change to green
-   - `/review-diff "<feature>"` → reviewer checklist
-   - Note: commit/PR/deploy are blocked by policy; you run them explicitly.
+   - `/map-feature "<key>"` → evidence-backed map
+   - `/plan-tight "<key>"` → lean plan (files, pseudo‑code, tests, risks)
+   - `/prime-context "<key>"` → pin context; then `/sanity-check`
+   - Review → `/approve-plan "<key>"` to unlock source edits (auto‑plan gate)
+   - `/write-tests-contract "<key>"` → contract-level tests
+   - `/implement-diff-min "<key>"` → smallest change to green
+   - `/review-diff "<key>"` → crisp decision
+   - Optional: `/parallel-worktrees "<key>" 3` to explore variants; use `/context-slim` to keep tokens lean
+   - Note: commit/PR/deploy blocked by policy; you run them explicitly.
 
 ## Safety
+- Auto‑plan: source edits require `.claude/session/ALLOW_EDITS` marker; docs and `.claude/` remain writable.
 - Hooks block sensitive writes and deny commits/PR merges/prod deploys; adjust in `.claude/hooks.json`.
-- Settings default to plan-mode; source edits ask; commits/PRs are denied; see `.claude/settings.json`.
+- Settings default to plan‑mode; see `.claude/settings.json`.
 
 ## Tuning
 - Update `CLAUDE.md` with your real scripts/paths.

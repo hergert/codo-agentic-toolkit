@@ -1,16 +1,12 @@
 ---
-description: Add or refine only contract-level tests that matter
-allowed-tools: Edit, Bash(go test ./*), Bash(go test -run*)
+description: Add only high‑value contract tests (public APIs/invariants)
+allowed-tools: Edit, Bash(go test ./...), Bash(go test -run*)
 ---
-# Input: $1 = feature/task name
+# Input: $1 = feature/task key
 
-1) From `docs/specs/$1-plan.md`, derive a minimal test set that:
-   - Exercises public APIs/handlers/CLIs and critical invariants.
-   - Covers at least one happy path + 2–3 edge/failure cases with business value.
-   - Avoids trivial assertions or tests of private helpers.
-2) For Go repos (detected via go.mod):
-   - Use table‑driven tests; prefer `httptest` for HTTP boundaries.
-   - Keep tests fast (no network unless mocked); avoid global state.
-3) Create/modify only the necessary `*_test.go` files listed in the plan.
-4) Run `!go test ./...`; summarize failures clearly. If non-plan files fail, propose smallest fixes OR add TODO(human) if the fix is uncertain.
-
+1) From `docs/specs/$1-plan.md`, propose a minimal test set that:
+   - Hits public API/handlers/CLI; 1 happy path + 2–3 valuable edge/failure cases.
+   - Uses table‑driven tests; `httptest` for HTTP boundaries.
+   - Stays fast: no network unless mocked; isolate global state.
+2) Create/modify only the planned `*_test.go` files.
+3) Run `!go test ./...`; summarize failures; avoid fixing unrelated code unless the plan requires it (YAGNI).

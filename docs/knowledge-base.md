@@ -46,7 +46,7 @@ Include in a short plan doc for each task:
 
 ## Pin the Working Context
 - Snapshot the working set for a task: links to the feature map and plan, current git status and `git diff --stat`, top N relevant paths, and the Golden Rules excerpt.
-- Use this as a shared reference to keep everyone aligned.
+- Use `/context-slim` to drop or summarize low‑value context; keep a short TL;DR.
 
 ## Testing (contract‑level)
 - Focus on public behavior and safety invariants; keep tests fast and valuable.
@@ -64,6 +64,7 @@ Guidance by ecosystem:
 - Stage only touched files; review diffs before asking for commit/PR.
 
 ## Guardrails & Permissions
+- Auto‑plan: require `.claude/session/ALLOW_EDITS` marker before source edits.
 - Deny writes to secrets/lockfiles/VCS internals/deploy manifests by default.
 - Treat installation/network access as high‑risk; require explicit approval.
 - Block commits/PR merges/prod deploys by default; let humans drive these.
@@ -99,4 +100,3 @@ Verify (examples)
 - Go: `go test ./...` | `go vet ./...` | `gofmt -l .`
 - JS/TS: `pnpm test -i` | `pnpm lint` | `pnpm format`
 - Python: `pytest -q` | `ruff check` | `black --check .`
-

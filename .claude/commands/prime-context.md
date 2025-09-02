@@ -1,14 +1,13 @@
 ---
-description: Snapshot the exact context we will use; pin diffs/specs/rules
+description: Snapshot working set (specs, diffs, rules) and pin a lean context
 allowed-tools: Edit, Bash(git status*), Bash(git diff*), Bash(git grep*)
 ---
-# Input: $1 = feature/task name
+# Input: $1 = feature/task key
 
-1) Create `docs/context/$1.md` containing:
-   - Link to `docs/feature-maps/$1.md` and `docs/specs/$1-plan.md` if present.
-   - Current git status (untracked/modified files) and a short `git diff --stat`.
-   - A context include list: up to 20 most relevant paths for this task.
-   - The GOLDEN RULES excerpt to keep in scope.
-2) Provide a one‑screen TL;DR (≤200 tokens) to prepend in this session.
-3) Suggest `/output-style surgical` and `/compact` if the context is large.
-
+1) Create `docs/context/$1.md` with:
+   - Links to `docs/feature-maps/$1.md` and `docs/specs/$1-plan.md`.
+   - `git status` and a short `git diff --stat`.
+   - Context include list: up to 20 high‑leverage files for this task.
+   - Golden Rules excerpt.
+   - A one‑screen TL;DR (≤200 tokens) to prepend in this session.
+2) Suggest running `/context` and propose drops/summaries to keep tokens low.
