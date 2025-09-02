@@ -5,7 +5,16 @@
       "hooks": [
         {
           "type": "command",
-          "command": "python3 - <<'PY'\nimport json,sys\nd=json.load(sys.stdin)\np=(d.get('tool_input',{}) or {}).get('file_path','')\ndeny=['.env','.git/','package-lock.json']\nsys.exit(2 if any(x in p for x in deny) else 0)\nPY"
+          "command": "python3 - <<'PY'\nimport json,sys,os,fnmatch\ne=json.load(sys.stdin)\np=e.get('tool_input',{}).get('file_path','') or ''\nBLOCKERS=['.env','/package-lock.json','/pnpm-lock.yaml','/yarn.lock','/.git/']\nif any(b in p for b in BLOCKERS):\n  print('Blocked write to sensitive file:', p)\n  sys.exit(2)\nsys.exit(0)\nPY"
+        }
+      ]
+    },
+    {
+      "matcher": "Bash(pip install*)|Bash(pnpm install*)|Bash(npm install*)",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "echo 'Install blocked by default. Use human approval or sandbox.' ; exit 2"
         }
       ]
     }
@@ -14,22 +23,17 @@
     {
       "matcher": "Edit|MultiEdit|Write",
       "hooks": [
-        {
-          "type": "command",
-          "command": "bash -lc 'read f; if [ -n \"$f\" ]; then   case \"$f\" in *.ts|*.tsx|*.js|*.jsx)   if command -v npx >/dev/null; then npx prettier --write \"$f\"; fi;; esac; fi'"
-        }
+        { "type": "command", "command": "jq -r '.tool_input.file_path' | { read f; case \"$f\" in *.ts|*.tsx|*.js|*.jsx) npx prettier --write \"$f\" ;; *.py) uv run ruff check --fix \"$f\"; uv run black \"$f\" ;; *.go) go fmt \"$f\" ;; esac; }" }
       ]
     }
   ],
-  "SessionStart": [
+  "Notification": [
     {
-      "matcher": "*",
+      "matcher": "SubagentStop|Stop",
       "hooks": [
-        {
-          "type": "command",
-          "command": "bash -lc 'echo \"[hooks] Session started in $(pwd)\" >&2'"
-        }
+        { "type": "command", "command": "echo '[Claude] Session ended. Ensure tests are green before /ship.'" }
       ]
     }
   ]
 }
+

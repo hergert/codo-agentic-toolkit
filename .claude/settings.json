@@ -1,68 +1,19 @@
 {
-  "mode": "default",
-  "additionalAllowedDirectories": [
-    "src",
-    "tests",
-    "docs",
-    ".claude"
+  "defaultMode": "plan",
+  "additionalDirectories": ["docs", "scripts", ".github"],
+  "rules": [
+    { "tool": "Edit|Write|MultiEdit", "scope": "src/**|tests/**", "policy": "ask" },
+    { "tool": "Edit|Write|MultiEdit", "scope": "package.json|pyproject.toml|go.mod", "policy": "ask" },
+    { "tool": "Edit|Write|MultiEdit", "scope": "**/*.env|**/.env|**/.git/**|**/package-lock.json|**/pnpm-lock.yaml|**/yarn.lock|**/.github/**|**/deploy/**", "policy": "deny" },
+
+    { "tool": "Bash(npm test*)|Bash(pnpm test*)|Bash(uv run pytest*)|Bash(pytest*)|Bash(go test*)", "policy": "allow" },
+    { "tool": "Bash(npm run build*)|Bash(pnpm build*)|Bash(uv run *)|Bash(pip install*)|Bash(pnpm install*)", "policy": "ask" },
+
+    { "tool": "Bash(git status*)|Bash(git diff*)|Bash(git add*)|Bash(git restore --staged*)|Bash(git checkout*)|Bash(git switch*)", "policy": "allow" },
+    { "tool": "Bash(git commit -m*)|Bash(git tag*)", "policy": "ask" },
+
+    { "tool": "Bash(gh pr create*)|Bash(gh pr view*)|Bash(gh pr status*)|Bash(gh pr merge*)", "policy": "ask" }
   ],
-  "tools": {
-    "Bash": {
-      "allow": [
-        "npm test*",
-        "npm run test*",
-        "npm run lint*",
-        "npm run typecheck*",
-        "npm run format*",
-        "git add*",
-        "git commit*",
-        "git checkout -b*",
-        "git checkout *",
-        "git status*",
-        "gh pr create*",
-        "gh pr view*",
-        "gh pr checkout*"
-      ],
-      "ask": [
-        "npm install*",
-        "npm run build*",
-        "gh*",
-        "git push*"
-      ],
-      "deny": [
-        "rm -rf*",
-        "curl * | sh*"
-      ]
-    },
-    "Edit": {
-      "allow": [
-        "**/*"
-      ],
-      "deny": [
-        ".git/**",
-        "**/.env",
-        "**/package-lock.json"
-      ]
-    },
-    "Write": {
-      "allow": [
-        "**/*"
-      ],
-      "deny": [
-        ".git/**"
-      ]
-    },
-    "MultiEdit": {
-      "allow": [
-        "**/*"
-      ],
-      "deny": [
-        ".git/**"
-      ]
-    }
-  },
-  "preferences": {
-    "thinkMoreByDefault": true,
-    "explanationsDefault": false
-  }
+  "notes": "Plan mode by default. Escalate to acceptEdits only after /plan-feature or /design-spec is approved. Use /compact before long runs; run /cost to watch budget."
 }
+

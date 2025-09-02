@@ -11,13 +11,12 @@ Drop this folder into the root of your repo. It provides:
 1) Open a terminal in your repo.
 2) Run `claude` to start interactive mode.
 3) Use these commands:
-   - `/spec` → write acceptance criteria first
-   - `/plan` → propose steps & diff strategy
-   - `/diff-plan` → preview patches (no edits)
-   - `/implement` → apply smallest diffs + run tests
+   - `/plan-feature "<feature>"` → spec + diff plan
+   - `/design-spec "<issue>"` → acceptance-test-first spec
+   - `/implement-diff "<feature>"` → tests first + minimal code
    - `/fix-tests` → minimal fixes to get green
-   - `/pr-open "<branch>" "<title>"` → open PR
-   - `/ship` → merge once CI passes
+   - `/review-diff "<feature>"` → review staged changes
+   - `/ship` → open PR once tests are green
    - `/compact` → summarize & trim context
 
 ## Safety
@@ -28,3 +27,7 @@ Drop this folder into the root of your repo. It provides:
 - Update `CLAUDE.md` with your real scripts/paths.
 - Extend `allowed-tools` per command for your stack.
 - Consider enabling a custom output style: `/output-style ~/.claude/output-styles/planner.md`.
+
+## Pack V1 Docs
+- Setup and usage: `docs/claude-pack-v1.md`
+- Knowledge base (general, repo‑agnostic): `docs/knowledge-base.md`
