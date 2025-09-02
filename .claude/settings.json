@@ -1,0 +1,68 @@
+{
+  "mode": "default",
+  "additionalAllowedDirectories": [
+    "src",
+    "tests",
+    "docs",
+    ".claude"
+  ],
+  "tools": {
+    "Bash": {
+      "allow": [
+        "npm test*",
+        "npm run test*",
+        "npm run lint*",
+        "npm run typecheck*",
+        "npm run format*",
+        "git add*",
+        "git commit*",
+        "git checkout -b*",
+        "git checkout *",
+        "git status*",
+        "gh pr create*",
+        "gh pr view*",
+        "gh pr checkout*"
+      ],
+      "ask": [
+        "npm install*",
+        "npm run build*",
+        "gh*",
+        "git push*"
+      ],
+      "deny": [
+        "rm -rf*",
+        "curl * | sh*"
+      ]
+    },
+    "Edit": {
+      "allow": [
+        "**/*"
+      ],
+      "deny": [
+        ".git/**",
+        "**/.env",
+        "**/package-lock.json"
+      ]
+    },
+    "Write": {
+      "allow": [
+        "**/*"
+      ],
+      "deny": [
+        ".git/**"
+      ]
+    },
+    "MultiEdit": {
+      "allow": [
+        "**/*"
+      ],
+      "deny": [
+        ".git/**"
+      ]
+    }
+  },
+  "preferences": {
+    "thinkMoreByDefault": true,
+    "explanationsDefault": false
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "PreToolUse": [
+    {
+      "matcher": "Edit|MultiEdit|Write",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "python3 - <<'PY'\nimport json,sys\nd=json.load(sys.stdin)\np=(d.get('tool_input',{}) or {}).get('file_path','')\ndeny=['.env','.git/','package-lock.json']\nsys.exit(2 if any(x in p for x in deny) else 0)\nPY"
+        }
+      ]
+    }
+  ],
+  "PostToolUse": [
+    {
+      "matcher": "Edit|MultiEdit|Write",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "bash -lc 'read f; if [ -n \"$f\" ]; then   case \"$f\" in *.ts|*.tsx|*.js|*.jsx)   if command -v npx >/dev/null; then npx prettier --write \"$f\"; fi;; esac; fi'"
+        }
+      ]
+    }
+  ],
+  "SessionStart": [
+    {
+      "matcher": "*",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "bash -lc 'echo \"[hooks] Session started in $(pwd)\" >&2'"
+        }
+      ]
+    }
+  ]
+}
