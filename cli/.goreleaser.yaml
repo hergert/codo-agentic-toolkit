@@ -1,0 +1,61 @@
+project_name: codo
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: codo
+    main: ./main.go
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X github.com/youruser/codo/cmd.version={{.Version}}
+    goos: [linux, darwin, windows]
+    goarch: [amd64, arm64]
+
+archives:
+  - builds: [codo]
+    format: tar.gz
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+
+checksum:
+  name_template: "checksums.txt"
+
+release:
+  github:
+    owner: youruser
+    name: codo
+  draft: false
+  prerelease: false
+
+brews:
+  - name: codo
+    repository:
+      owner: youruser
+      name: homebrew-tap
+    commit_author:
+      name: youruser
+      email: you@example.com
+    directory: Formula
+    homepage: "https://github.com/youruser/codo"
+    description: "Modern CLI to install/update/remove the Codo Agentic Toolkit."
+    install: |
+      bin.install "codo"
+
+scoops:
+  - name: codo
+    bucket:
+      owner: youruser
+      name: scoop-bucket
+    homepage: "https://github.com/youruser/codo"
+    description: "Modern CLI to manage the Codo Agentic Toolkit."
+
+winget:
+  - name: youruser.codo
+    publisher: "Your Name"
+    short_description: "Modern CLI to manage the Codo Agentic Toolkit."
+    homepage: "https://github.com/youruser/codo"
+
