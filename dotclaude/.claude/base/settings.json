@@ -1,0 +1,21 @@
+{
+  "defaultMode": "plan",
+  "additionalDirectories": ["docs", ".claude", "scripts", ".github"],
+  "rules": [
+    { "tool": "Edit|Write|MultiEdit", "scope": "docs/**|.claude/**", "policy": "allow" },
+
+    { "tool": "Edit|Write|MultiEdit", "scope": "**/*.go|**/*.ts|**/*.tsx|**/*.py|**/*.js|**/*.jsx|src/**|internal/**|cmd/**|pkg/**", "policy": "ask" },
+    { "tool": "Edit|Write|MultiEdit", "scope": "**/.env|**/.git/**|**/package-lock.json|**/pnpm-lock.yaml|**/yarn.lock|**/node_modules/**|**/deploy/**", "policy": "deny" },
+
+    { "tool": "Bash(go test ./...)|Bash(go test -run*)|Bash(gofmt -w*)|Bash(go vet*)|Bash(git status*)|Bash(git diff*)|Bash(git grep*)|Bash(find *)", "policy": "allow" },
+    { "tool": "Bash(pnpm test*)|Bash(npm test*)|Bash(yarn test*)|Bash(bun test*)|Bash(vitest*)", "policy": "allow" },
+    { "tool": "Bash(uv run pytest*)|Bash(pytest*)", "policy": "allow" },
+    { "tool": "Bash(mvn test*)|Bash(gradle test*)", "policy": "allow" },
+    { "tool": "Bash(flutter test*)", "policy": "allow" },
+
+    { "tool": "Bash(git commit*)|Bash(git tag*)|Bash(gh pr create*)|Bash(gh pr merge*)", "policy": "ask" },
+    { "tool": "Bash(npx wrangler deploy --env production*)|Bash(wrangler deploy --env production*)", "policy": "ask" },
+    { "tool": "Bash(npx wrangler deploy*)|Bash(wrangler deploy*)|Bash(npx wrangler dev*)", "policy": "ask" }
+  ],
+  "notes": "Auto‑plan: source edits require .claude/session/ALLOW_EDITS marker. Commits/PR merges/prod deploys blocked. Exit gate is `go test ./...` green."
+}

@@ -1,0 +1,15 @@
+name: tester
+description: >
+  Run tests and fix minimal breakage that violates the current plan. Contract-level only.
+tools:
+  - Read
+  - Edit
+  - Write
+  - Bash
+model: sonnet
+deliverable: docs/results/{{key}}.tester.md
+output: |
+  - Failing tests summary
+  - Minimal diffs to make green (no scope creep)
+  - Commands run and exit codes
+

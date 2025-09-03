@@ -5,6 +5,7 @@ import (
     "fmt"
     "os"
     "path/filepath"
+    "strings"
 
     "github.com/spf13/cobra"
 
@@ -16,6 +17,8 @@ import (
 
 var initVersion string
 var initDryRun bool
+var initStacks string // comma-separated
+var initNoTUI bool    // headless mode
 
 var initCmd = &cobra.Command{
     Use:   "init",
@@ -24,14 +27,31 @@ var initCmd = &cobra.Command{
         root, _ := os.Getwd()
         ctx := context.Background()
 
-        choices, err := tui.RunInitWizard(ctx)
-        if err != nil { return err }
-        if !choices.Confirmed {
-            fmt.Println("aborted")
-            return nil
+        var choices tui.InitResult
+        if initNoTUI || initStacks != "" {
+            // Headless: parse stacks from flag
+            keys := []string{}
+            for _, s := range strings.Split(initStacks, ",") {
+                ss := strings.TrimSpace(s)
+                if ss != "" { keys = append(keys, ss) }
+            }
+            choices = tui.InitResult{Stacks: keys, Confirmed: true}
+        } else {
+            var err error
+            choices, err = tui.RunInitWizard(ctx)
+            if err != nil { return err }
+            if !choices.Confirmed {
+                fmt.Println("aborted")
+                return nil
+            }
         }
 
-        files, err := pack.Files(initVersion, choices.Stacks)
+        // Prefer local pack at dotclaude/ for development; fallback to embedded pack.
+        if _, err := os.Stat("dotclaude"); err != nil {
+            return fmt.Errorf("dotclaude pack not found; expected ./dotclaude directory")
+        }
+        rootFS := os.DirFS("dotclaude")
+        files, err := pack.FilesFromDotclaudeFS(rootFS, choices.Stacks)
         if err != nil { return err }
 
         reportDir := filepath.Join(".claude", ".codo-report")
@@ -43,15 +63,20 @@ var initCmd = &cobra.Command{
         }
         if !initDryRun {
             if err := fsops.ChmodHooks(); err != nil { return err }
-            if err := manifest.Write(files, pack.VersionOrDefault(initVersion)); err != nil { return err }
+            installedVersion := initVersion
+            if installedVersion == "" { installedVersion = "local" }
+            if err := manifest.WriteWithStacks(files, installedVersion, choices.Stacks); err != nil { return err }
         }
-        fmt.Printf("\nCodo %s initialized. See .claude/.codo-report/conflicts.txt if any.\n", pack.VersionOrDefault(initVersion))
+        installedVersion := initVersion
+        if installedVersion == "" { installedVersion = "local" }
+        fmt.Printf("\nCodo %s initialized. See .claude/.codo-report/conflicts.txt if any.\n", installedVersion)
         return nil
     },
 }
 
 func init() {
-    initCmd.Flags().StringVar(&initVersion, "version", "", "Pack version (default embedded)")
+    initCmd.Flags().StringVar(&initVersion, "version", "", "Pack tag (e.g. v1.2.0) or 'local'")
     initCmd.Flags().BoolVar(&initDryRun, "dry-run", false, "Preview only; do not write files")
+    initCmd.Flags().StringVar(&initStacks, "stacks", "", "Comma-separated stacks (skip TUI)")
+    initCmd.Flags().BoolVar(&initNoTUI, "no-tui", false, "Don't show the TUI wizard")
 }
-

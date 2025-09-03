@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: cli/go.mod
+          check-latest: true
+          cache: true
+          cache-dependency-path: cli/go.sum
+
+      - name: Verify build
+        working-directory: cli
+        run: go build ./...
+
+      - name: Vet & Test (race)
+        working-directory: cli
+        run: |
+          go vet ./...
+          go test -race ./...
+
+      - name: GoReleaser snapshot (no publish)
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          version: latest
+          args: release --clean --skip=publish
+          workdir: ./cli
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload snapshot artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: codo-snapshot-${{ github.sha }}
+          path: |
+            cli/dist/**/*
+          if-no-files-found: ignore
+

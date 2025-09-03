@@ -1,0 +1,82 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Semver tag to release (e.g., v0.1.0). Leave blank to use current tag run."
+        required: false
+      create_tag:
+        description: "Create and push the tag before releasing?"
+        type: boolean
+        default: true
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout (full history for changelog)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: cli/go.mod
+          check-latest: true
+          cache: true
+          cache-dependency-path: cli/go.sum
+
+      - name: Create tag (if requested via dispatch)
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.create_tag == true && inputs.tag != '' }}
+        run: |
+          git config user.name "codo-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git tag -a "${{ inputs.tag }}" -m "Release ${{ inputs.tag }}"
+          git push origin "${{ inputs.tag }}"
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          version: latest
+          args: release --clean
+          workdir: ./cli
+        env:
+          # Default token works for releases in the same repo.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # If your Homebrew tap / Scoop bucket / Winget repo are separate, provide a PAT instead:
+          # GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+
+      - name: Package dotclaude pack asset
+        run: |
+          set -euo pipefail
+          tag="${GITHUB_REF_NAME}"
+          cd "$GITHUB_WORKSPACE"
+          if [ ! -d dotclaude ]; then
+            echo "dotclaude not found; skipping pack asset" >&2
+            exit 0
+          fi
+          zip -r "dotclaude-pack-${tag}.zip" dotclaude
+          shasum -a 256 "dotclaude-pack-${tag}.zip" > "dotclaude-pack-${tag}.sha256"
+
+      - name: Upload pack asset to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dotclaude-pack-${{ github.ref_name }}.zip
+            dotclaude-pack-${{ github.ref_name }}.sha256
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

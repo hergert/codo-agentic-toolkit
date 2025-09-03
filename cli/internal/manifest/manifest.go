@@ -21,6 +21,7 @@ type Manifest struct {
     Version     string  `json:"version"`
     InstalledAt string  `json:"installed_at"`
     Files       []Entry `json:"files"`
+    Stacks      []string `json:"stacks,omitempty"`
 }
 
 func Exists() bool {
@@ -29,6 +30,10 @@ func Exists() bool {
 }
 
 func Write(files []pack.File, version string) error {
+    return WriteWithStacks(files, version, nil)
+}
+
+func WriteWithStacks(files []pack.File, version string, stacks []string) error {
     if err := os.MkdirAll(filepath.Dir(filePath), 0o755); err != nil {
         return err
     }
@@ -48,7 +53,7 @@ func Write(files []pack.File, version string) error {
         }
         entries = append(entries, Entry{Path: dst, SHA256: sum})
     }
-    m := Manifest{Version: version, InstalledAt: "", Files: entries}
+    m := Manifest{Version: version, InstalledAt: "", Files: entries, Stacks: stacks}
     buf, _ := json.MarshalIndent(m, "", "  ")
     return os.WriteFile(filePath, buf, 0o644)
 }
@@ -64,4 +69,3 @@ func Open() (Manifest, error) {
     err = json.Unmarshal(b, &m)
     return m, err
 }
-
