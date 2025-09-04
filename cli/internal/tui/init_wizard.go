@@ -68,7 +68,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m model) View() string {
     var b strings.Builder
-    fmt.Fprintln(&b, "Select stacks to include (space to toggle):\n")
+    fmt.Fprint(&b, "Select stacks to include (space to toggle):\n\n")
     for i, o := range opts {
         cursor := " "
         if m.cursor == i { cursor = ">" }
