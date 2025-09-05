@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -43,7 +43,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v6
         with:
           version: latest
-          args: release --clean --skip=publish
+          args: release --clean --snapshot --skip=publish
           workdir: ./cli
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -55,4 +55,19 @@ jobs:
           path: |
             cli/dist/**/*
           if-no-files-found: ignore
+
+      - name: Update latest release
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Latest Build
+          prerelease: true
+          body: |
+            Latest build from main branch
+            - Commit: ${{ github.sha }}
+            - Date: ${{ github.event.head_commit.timestamp }}
+          files: cli/dist/*.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
