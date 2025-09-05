@@ -49,15 +49,19 @@ brews:
 
 scoops:
   - name: codo
-    bucket:
+    repository:
       owner: youruser
       name: scoop-bucket
     homepage: "https://github.com/youruser/codo"
     description: "Modern CLI to manage the Codo Agentic Toolkit."
 
 winget:
-  - name: youruser.codo
-    publisher: "Your Name"
+  - name: codo
+    publisher: "Codo Team"
+    package_identifier: youruser.codo
     short_description: "Modern CLI to manage the Codo Agentic Toolkit."
     homepage: "https://github.com/youruser/codo"
+    repository:
+      owner: youruser
+      name: winget-pkgs
 
