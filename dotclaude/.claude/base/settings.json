@@ -17,5 +17,5 @@
     { "tool": "Bash(npx wrangler deploy --env production*)|Bash(wrangler deploy --env production*)", "policy": "ask" },
     { "tool": "Bash(npx wrangler deploy*)|Bash(wrangler deploy*)|Bash(npx wrangler dev*)", "policy": "ask" }
   ],
-  "notes": "Auto‑plan: source edits require .claude/session/ALLOW_EDITS marker. Commits/PR merges/prod deploys blocked. Exit gate is `go test ./...` green."
+  "notes": "Auto‑plan: source edits require .claude/session/ALLOW_EDITS marker. Commits/PRs ask (gated by ALLOW_COMMITS/FAST_MODE). Production deploys ask (gated by ALLOW_PROD_DEPLOY). Exit gate: tests green."
 }

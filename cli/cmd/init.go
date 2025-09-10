@@ -9,10 +9,10 @@ import (
 
     "github.com/spf13/cobra"
 
-    "github.com/youruser/codo/internal/fsops"
-    "github.com/youruser/codo/internal/manifest"
-    "github.com/youruser/codo/internal/pack"
-    "github.com/youruser/codo/internal/tui"
+    "github.com/hergert/codo-agentic-toolkit/cli/internal/fsops"
+    "github.com/hergert/codo-agentic-toolkit/cli/internal/manifest"
+    "github.com/hergert/codo-agentic-toolkit/cli/internal/pack"
+    "github.com/hergert/codo-agentic-toolkit/cli/internal/tui"
 )
 
 var initVersion string

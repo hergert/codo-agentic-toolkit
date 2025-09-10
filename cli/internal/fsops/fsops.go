@@ -7,7 +7,7 @@ import (
     "os"
     "path/filepath"
 
-    "github.com/youruser/codo/internal/pack"
+    "github.com/hergert/codo-agentic-toolkit/cli/internal/pack"
 )
 
 func sha256File(path string) (string, error) {

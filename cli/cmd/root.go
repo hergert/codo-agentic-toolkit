@@ -7,7 +7,7 @@ import (
     "github.com/spf13/cobra"
 )
 
-// Set via -ldflags "-X github.com/youruser/codo/cmd.version=vX.Y.Z"
+// Set via -ldflags "-X github.com/hergert/codo-agentic-toolkit/cli/cmd.version=vX.Y.Z"
 var version = "dev"
 
 func Execute() { cobra.CheckErr(rootCmd.Execute()) }

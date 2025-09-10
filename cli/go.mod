@@ -1,4 +1,4 @@
-module github.com/youruser/codo
+module github.com/hergert/codo-agentic-toolkit/cli
 
 go 1.22
 

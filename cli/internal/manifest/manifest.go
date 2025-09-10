@@ -8,7 +8,7 @@ import (
     "os"
     "path/filepath"
 
-    "github.com/youruser/codo/internal/pack"
+    "github.com/hergert/codo-agentic-toolkit/cli/internal/pack"
 )
 
 const filePath = ".claude/.codo-manifest.json"

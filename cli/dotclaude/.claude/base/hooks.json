@@ -1,0 +1,14 @@
+{
+  "UserPromptSubmit": [
+    { "hooks": [ { "type": "command", "command": "python3 .claude/hooks/user_prompt_submit.py" } ] }
+  ],
+  "PreToolUse": [
+    { "matcher": "*", "hooks": [ { "type": "command", "command": "python3 .claude/hooks/pre_tool_use.py" } ] }
+  ],
+  "PostToolUse": [
+    { "matcher": "Edit|MultiEdit|Write", "hooks": [ { "type": "command", "command": "python3 .claude/hooks/post_tool_use.py" } ] }
+  ],
+  "Notification": [
+    { "matcher": "Stop|SubagentStop", "hooks": [ { "type": "command", "command": "echo '[Claude] Gates → edits: ALLOW_EDITS/FAST_MODE | commits: ALLOW_COMMITS/FAST_MODE | prod: ALLOW_PROD_DEPLOY | DB: ALLOW_DB_MIGRATE | mobile: ALLOW_MOBILE_RELEASE'" } ] }
+  ]
+}

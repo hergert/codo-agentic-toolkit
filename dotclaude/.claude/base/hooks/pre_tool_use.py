@@ -19,14 +19,13 @@ if tool in ("Edit","Write","MultiEdit") and not (fast or approved):
     sys.exit(2)
 
 # Secrets / sensitive paths guard
-BLOCK = (
-    ".env", "/.env", ".env.", "/.env.", "/.env.local", "/.env.production", "/.env.development",
-    "/.git/", "package-lock.json", "pnpm-lock.yaml", "yarn.lock",
-    "id_rsa", "id_ed25519", "known_hosts",
-    "secrets.", "secret.", "credentials.", "config/secrets",
-    "google-services.json", "GoogleService-Info.plist", "serviceAccountKey.json", "firebase"
-)
-if any(b in path for b in BLOCK):
+bn = os.path.basename(path)
+BLOCK_BASENAMES = {".env", ".env.local", ".env.production", ".env.development",
+                   "package-lock.json","pnpm-lock.yaml","yarn.lock",
+                   "id_rsa","id_ed25519","known_hosts",
+                   "serviceAccountKey.json","GoogleService-Info.plist","google-services.json"}
+BLOCK_DIR_SUBSTR = ("/.git/", "/config/secrets/")
+if bn in BLOCK_BASENAMES or any(s in path for s in BLOCK_DIR_SUBSTR):
     print(f"✋ blocked write to sensitive: {path}", file=sys.stderr)
     sys.exit(2)
 

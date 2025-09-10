@@ -7,8 +7,8 @@ import (
     "path/filepath"
 
     "github.com/spf13/cobra"
-    "github.com/youruser/codo/internal/manifest"
-    "github.com/youruser/codo/internal/pack"
+    "github.com/hergert/codo-agentic-toolkit/cli/internal/manifest"
+    "github.com/hergert/codo-agentic-toolkit/cli/internal/pack"
 )
 
 var updateTo string

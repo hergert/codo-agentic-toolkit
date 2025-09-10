@@ -13,7 +13,7 @@ var selfUpdateCmd = &cobra.Command{
     Use:   "self-update",
     Short: "Update the codo binary to the latest release",
     RunE: func(cmd *cobra.Command, args []string) error {
-        latest, found, err := selfupdate.DetectLatest("youruser/codo")
+        latest, found, err := selfupdate.DetectLatest("hergert/codo-agentic-toolkit")
         if err != nil { return err }
         v, err := semver.Parse(version)
         if err != nil { return err }
@@ -22,7 +22,11 @@ var selfUpdateCmd = &cobra.Command{
             return nil
         }
         // Note: For extra safety, verify checksum here using latest checksum info if available.
-        if err := selfupdate.UpdateTo(latest.AssetURL, os.Args[0]); err != nil { return err }
+        exe, err := os.Executable()
+        if err != nil {
+            exe = os.Args[0]
+        }
+        if err := selfupdate.UpdateTo(latest.AssetURL, exe); err != nil { return err }
         fmt.Println("Updated to", latest.Version)
         return nil
     },

@@ -7,7 +7,7 @@ import (
     "time"
 
     "github.com/spf13/cobra"
-    "github.com/youruser/codo/internal/manifest"
+    "github.com/hergert/codo-agentic-toolkit/cli/internal/manifest"
 )
 
 var removeDry bool

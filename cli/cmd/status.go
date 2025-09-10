@@ -6,8 +6,10 @@ import (
     "os"
 
     "github.com/spf13/cobra"
-    "github.com/youruser/codo/internal/manifest"
+    "github.com/hergert/codo-agentic-toolkit/cli/internal/manifest"
 )
+
+var strictFlag bool
 
 var statusCmd = &cobra.Command{
     Use:   "status",
@@ -31,7 +33,14 @@ var statusCmd = &cobra.Command{
         } else {
             fmt.Println("Drift:")
             for _, d := range drift { fmt.Println(" ", d) }
+            if strictFlag {
+                return fmt.Errorf("drift detected")
+            }
         }
         return nil
     },
+}
+
+func init() {
+    statusCmd.Flags().BoolVar(&strictFlag, "strict", false, "Exit non-zero if drift exists")
 }
