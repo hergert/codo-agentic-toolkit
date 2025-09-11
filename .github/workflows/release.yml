@@ -63,20 +63,19 @@ jobs:
       - name: Package dotclaude pack asset
         run: |
           set -euo pipefail
-          tag="${GITHUB_REF_NAME}"
           cd "$GITHUB_WORKSPACE"
-          if [ ! -d dotclaude ]; then
-            echo "dotclaude not found; skipping pack asset" >&2
+          if [ ! -d pack ]; then
+            echo "pack not found; skipping pack asset" >&2
             exit 0
           fi
-          zip -r "dotclaude-pack-${tag}.zip" dotclaude
-          shasum -a 256 "dotclaude-pack-${tag}.zip" > "dotclaude-pack-${tag}.sha256"
+          zip -r "dotclaude-pack.zip" pack
+          shasum -a 256 "dotclaude-pack.zip" > "dotclaude-pack.sha256"
 
       - name: Upload pack asset to release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            dotclaude-pack-${{ github.ref_name }}.zip
-            dotclaude-pack-${{ github.ref_name }}.sha256
+            dotclaude-pack.zip
+            dotclaude-pack.sha256
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

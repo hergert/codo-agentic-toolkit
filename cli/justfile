@@ -1,0 +1,77 @@
+# CLI build and development commands
+
+# Default: show available commands
+default:
+    @just --list
+
+# Build the binary with embedded content (output to repo root dist/)
+build:
+    @echo "Building codo with embedded pack..."
+    @rm -rf .embedded_pack
+    @cp -r ../pack .embedded_pack
+    @mkdir -p ../dist
+    @go build -o ../dist/codo .
+    @rm -rf .embedded_pack
+    @echo "✅ Built ../dist/codo"
+
+# Clean build artifacts
+clean:
+    @echo "Cleaning..."
+    @rm -rf ../dist
+    @rm -rf .embedded_pack
+
+# Install to ~/.local/bin
+install: build
+    @echo "Installing to ~/.local/bin/codo..."
+    @mkdir -p ~/.local/bin
+    @cp ../dist/codo ~/.local/bin/codo
+    @echo "✅ Installed to ~/.local/bin/codo"
+
+# Development build (no install)
+dev: build
+    @echo "✅ Built codo binary in dist/"
+
+# Run tests
+test:
+    go test ./...
+
+# Run tests with race detector
+test-race:
+    go test -race ./...
+
+# Run go vet
+vet:
+    go vet ./...
+
+# Format code
+fmt:
+    go fmt ./...
+
+# Run linter (if golangci-lint is installed)
+lint:
+    #!/usr/bin/env sh
+    if command -v golangci-lint >/dev/null 2>&1; then
+        golangci-lint run
+    else
+        echo "⚠️  golangci-lint not installed"
+        echo "   Install with: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest"
+        echo "   Running go vet instead..."
+        go vet ./...
+    fi
+
+# Full check: format, lint, and test
+check: fmt lint test
+
+# Build snapshot with GoReleaser (for testing releases)
+# Note: GoReleaser creates its own dist directory for release artifacts
+snapshot:
+    #!/usr/bin/env sh
+    if ! command -v goreleaser >/dev/null 2>&1; then
+        echo "❌ goreleaser not installed. Install with: go install github.com/goreleaser/goreleaser/v2@latest"
+        exit 1
+    fi
+    goreleaser release --clean --skip=publish --snapshot
+
+# Quick validation before push
+validate: fmt vet test-race
+    @echo "✅ All validations passed!"

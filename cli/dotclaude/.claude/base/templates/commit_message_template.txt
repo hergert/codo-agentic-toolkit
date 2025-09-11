@@ -1,9 +1,0 @@
-feat(scope): one‑line intent
-
-Why
--
-How
--
-Tests
--
-

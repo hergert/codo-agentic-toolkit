@@ -12,17 +12,52 @@ import (
 	"strings"
 )
 
+// headOK checks if a URL is accessible via HEAD request
+func headOK(u string) bool {
+	r, err := http.Head(u)
+	if err != nil {
+		return false
+	}
+	r.Body.Close()
+	return r.StatusCode == http.StatusOK
+}
+
 // Resolve downloads and verifies a pack from GitHub releases
 func Resolve(tag string) (string, error) {
 	baseURL := "https://github.com/hergert/codo-agentic-toolkit/releases"
-	if tag == "latest" {
-		tag = "latest/download"
+	
+	// Normalize tag for URL construction
+	urlTag := tag
+	if tag == "" || tag == "latest" {
+		urlTag = "latest/download"
+		tag = "latest"
 	} else {
-		tag = "download/" + tag
+		urlTag = "download/" + tag
 	}
-
-	packURL := fmt.Sprintf("%s/%s/dotclaude-pack.zip", baseURL, tag)
-	checksumURL := fmt.Sprintf("%s/%s/dotclaude-pack.sha256", baseURL, tag)
+	
+	// Try both naming patterns: flat names (recommended) and tag-suffixed names (legacy)
+	var packURL, checksumURL string
+	patterns := []struct {
+		zip string
+		sha string
+	}{
+		{"dotclaude-pack.zip", "dotclaude-pack.sha256"},
+		{fmt.Sprintf("dotclaude-pack-%s.zip", tag), fmt.Sprintf("dotclaude-pack-%s.sha256", tag)},
+	}
+	
+	for _, p := range patterns {
+		testPackURL := fmt.Sprintf("%s/%s/%s", baseURL, urlTag, p.zip)
+		testChecksumURL := fmt.Sprintf("%s/%s/%s", baseURL, urlTag, p.sha)
+		if headOK(testPackURL) && headOK(testChecksumURL) {
+			packURL = testPackURL
+			checksumURL = testChecksumURL
+			break
+		}
+	}
+	
+	if packURL == "" {
+		return "", fmt.Errorf("no pack asset found for tag=%s", tag)
+	}
 
 	// Download to ~/.codo/packs/<tag>/
 	home, err := os.UserHomeDir()
@@ -65,7 +100,7 @@ func Resolve(tag string) (string, error) {
 	}
 
 	// Extract pack
-	extractDir := filepath.Join(cacheDir, "dotclaude")
+	extractDir := filepath.Join(cacheDir, "pack")
 	if err := extractZip(zipPath, extractDir); err != nil {
 		return "", fmt.Errorf("failed to extract pack: %w", err)
 	}

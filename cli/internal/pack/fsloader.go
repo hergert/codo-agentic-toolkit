@@ -7,12 +7,12 @@ import (
     "strings"
 )
 
-// FilesFromDotclaudeFS composes .claude/base + selected .claude/stacks/<stack>
+// FilesFromDotclaudeFS composes dotclaude + selected stacks/<stack>
 // and includes top-level files (CLAUDE.md, docs/**) from the provided FS root.
 // The returned RelPath is the project-relative destination path.
 func FilesFromDotclaudeFS(root fs.FS, stacks []string) ([]File, error) {
-    const baseRoot = ".claude/base"
-    const stacksRoot = ".claude/stacks"
+    const baseRoot = "dotclaude"
+    const stacksRoot = "stacks"
 
     index := map[string]string{} // rel -> FS path
 
@@ -34,7 +34,7 @@ func FilesFromDotclaudeFS(root fs.FS, stacks []string) ([]File, error) {
         }
     }
 
-    // 2) overlays
+    // 2) stack overlays
     for _, s := range want {
         base := filepath.Join(stacksRoot, s)
         _ = fs.WalkDir(root, base, func(p string, d fs.DirEntry, err error) error {
@@ -47,11 +47,12 @@ func FilesFromDotclaudeFS(root fs.FS, stacks []string) ([]File, error) {
         })
     }
 
-    // 3) Top-level non-.claude files (e.g., CLAUDE.md, docs/**)
+    // 3) Top-level files (CLAUDE.md, docs/**)
     _ = fs.WalkDir(root, ".", func(p string, d fs.DirEntry, err error) error {
         if err != nil { return nil }
         if d.IsDir() { return nil }
-        if strings.HasPrefix(p, ".claude/") { return nil }
+        // Skip dotclaude and stacks directories
+        if strings.HasPrefix(p, "dotclaude/") || strings.HasPrefix(p, "stacks/") { return nil }
         index[filepath.ToSlash(p)] = p
         return nil
     })

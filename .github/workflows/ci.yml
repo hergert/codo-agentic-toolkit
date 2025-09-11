@@ -56,6 +56,16 @@ jobs:
             cli/dist/**/*
           if-no-files-found: ignore
 
+      - name: Package pack for latest release
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          set -euo pipefail
+          cd "$GITHUB_WORKSPACE"
+          if [ -d pack ]; then
+            zip -r "dotclaude-pack.zip" pack
+            shasum -a 256 "dotclaude-pack.zip" > "dotclaude-pack.sha256"
+          fi
+
       - name: Update latest release
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         uses: softprops/action-gh-release@v2
@@ -67,7 +77,11 @@ jobs:
             Latest build from main branch
             - Commit: ${{ github.sha }}
             - Date: ${{ github.event.head_commit.timestamp }}
-          files: cli/dist/*.tar.gz
+          files: |
+            cli/dist/*.tar.gz
+            cli/dist/checksums.txt
+            dotclaude-pack.zip
+            dotclaude-pack.sha256
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

@@ -1,53 +1,81 @@
-# Match CI validation steps from .github/workflows/ci.yml
+# Codo Agentic Toolkit - Development Commands
 
-# Default: run all CI checks
-default: ci
+# Default: show help
+default:
+    @just --list
 
-# Build the project
+# === CLI Commands (delegate to cli/justfile) ===
+
+# Build codo binary with embedded pack
 build:
-    cd cli && go build ./...
+    cd cli && just build
 
-# Run go vet
-vet:
-    cd cli && go vet ./...
+# Install codo to ~/.local/bin
+install:
+    cd cli && just install
+
+# Build for development (no install)
+dev:
+    cd cli && just dev
+
+# === Testing & Validation ===
 
 # Run tests
 test:
-    cd cli && go test ./...
+    cd cli && just test
 
 # Run tests with race detector
-race:
-    cd cli && go test -race ./...
+test-race:
+    cd cli && just test-race
+
+# Run go vet
+vet:
+    cd cli && just vet
 
 # Run all CI checks (matches GitHub Actions)
-ci: build vet race
+ci: vet test-race
     @echo "✅ All CI checks passed!"
 
-# Quick validation before push (alias for ci)
-validate: ci
+# Quick validation before push
+validate:
+    cd cli && just validate
 
-# GoReleaser snapshot build (requires goreleaser installed)
+# === Build & Release ===
+
+# GoReleaser snapshot build (for testing releases)
 snapshot:
-    #!/usr/bin/env sh
-    if ! command -v goreleaser >/dev/null 2>&1; then
-        echo "❌ goreleaser not installed. Install with: go install github.com/goreleaser/goreleaser/v2@latest"
-        exit 1
-    fi
-    cd cli && goreleaser release --clean --skip=publish --snapshot
+    cd cli && just snapshot
 
 # Clean build artifacts
 clean:
-    rm -rf cli/dist/
-    cd cli && go clean ./...
-    cd cli && go clean -testcache
+    @rm -rf dist
+    @rm -rf cli/.embedded_pack
+
+# === Development Tools ===
 
 # Run build and watch for changes (requires watchexec)
 watch:
-    cd cli && watchexec -e go -r -- go build ./...
+    cd cli && watchexec -e go -r -- just build
 
 # Run tests and watch for changes
 watch-test:
-    cd cli && watchexec -e go -r -- go test ./...
+    cd cli && watchexec -e go -r -- just test
+
+# === Code Quality ===
+
+# Format code
+fmt:
+    cd cli && just fmt
+
+# Run linter
+lint:
+    cd cli && just lint
+
+# Full check: format, lint, and test
+check:
+    cd cli && just check
+
+# === Dependencies ===
 
 # Install dependencies
 deps:
@@ -58,25 +86,3 @@ deps:
 update-deps:
     cd cli && go get -u ./...
     cd cli && go mod tidy
-
-# Format code
-fmt:
-    cd cli && go fmt ./...
-    
-# Run linter (requires golangci-lint)
-lint:
-    #!/usr/bin/env sh
-    if ! command -v golangci-lint >/dev/null 2>&1; then
-        echo "⚠️  golangci-lint not installed. Install with: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest"
-        echo "   Running basic go vet instead..."
-        cd cli && go vet ./...
-    else
-        cd cli && golangci-lint run
-    fi
-
-# Full check: format, lint, and test
-check: fmt lint ci
-
-# Show all available commands
-help:
-    @just --list
