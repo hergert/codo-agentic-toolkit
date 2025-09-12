@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(go build:*)",
+      "Bash(go get:*)",
+      "Bash(go mod:*)",
+      "Bash(just ci:*)",
+      "Bash(command -v:*)",
+      "Bash(cp:*)",
+      "Bash(ln:*)",
+      "Bash(make:*)",
+      "Bash(just:*)",
+      "Read(//Users/gertpetja/Spaces/tools/testing/**)",
+      "Read(//private/tmp/test-codo/**)",
+      "Bash(codo remove:*)",
+      "Bash(../dist/codo init --help)",
+      "Bash(/Users/gertpetja/Spaces/tools/codo-agentic-toolkit/dist/codo update --dry-run)",
+      "Read(//private/tmp/test-codo2/**)",
+      "Bash(/Users/gertpetja/Spaces/tools/codo-agentic-toolkit/dist/codo remove --dry-run)",
+      "Bash(../dist/codo version)",
+      "Bash(../dist/codo --help)",
+      "Bash(rm:*)",
+      "Bash(mkdir:*)",
+      "Bash(git init:*)",
+      "Bash(/Users/gertpetja/Spaces/tools/codo-agentic-toolkit/dist/codo init --no-tui --offline)",
+      "Bash(cat:*)",
+      "Bash(python3:*)",
+      "Bash(chmod:*)",
+      "Bash(git rm:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

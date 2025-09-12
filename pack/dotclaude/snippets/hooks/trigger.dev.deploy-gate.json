@@ -1,5 +1,11 @@
-{
-  "name": "trigger.dev.deploy-gate",
-  "description": "placeholder trigger.dev deploy gate"
-}
-
+[
+  {
+    "matcher": "Bash(trigger deploy*)|Bash(npx trigger.dev deploy*)",
+    "hooks": [
+      {
+        "type": "command",
+        "command": "bash -lc 'if [ ! -f .claude/session/ALLOW_TRIGGER_DEPLOY ]; then echo \"✋ trigger.dev deploy blocked (set ALLOW_TRIGGER_DEPLOY)\"; exit 2; fi'"
+      }
+    ]
+  }
+]

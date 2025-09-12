@@ -48,6 +48,9 @@ cli/.embedded_pack
 .claude/.codo-report/
 .claude/session/
 
+# Local Claude settings (do not commit)
+.claude/settings.local.json
+
 # Parallel worktrees
 trees/
 

@@ -1,5 +1,11 @@
-{
-  "name": "supabase.db-gate",
-  "description": "placeholder Supabase DB gate"
-}
-
+[
+  {
+    "matcher": "Bash(supabase db push*)|Bash(supabase migration*)",
+    "hooks": [
+      {
+        "type": "command",
+        "command": "bash -lc 'if [ ! -f .claude/session/ALLOW_DB_MIGRATE ]; then echo \"✋ database migration blocked (set ALLOW_DB_MIGRATE)\"; exit 2; fi'"
+      }
+    ]
+  }
+]

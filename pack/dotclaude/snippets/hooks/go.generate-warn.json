@@ -1,5 +1,11 @@
-{
-  "name": "go.generate-warn",
-  "description": "warn on go generate"
-}
-
+[
+  {
+    "matcher": "Bash(go generate*)",
+    "hooks": [
+      {
+        "type": "command",
+        "command": "echo \"⚠️  Warning: go generate may modify files. Review changes carefully.\""
+      }
+    ]
+  }
+]

@@ -1,5 +1,11 @@
-{
-  "name": "flutter.release-gate",
-  "description": "placeholder Flutter release gate"
-}
-
+[
+  {
+    "matcher": "Bash(flutter build apk*)|Bash(flutter build ios*)|Bash(flutter build appbundle*)|Bash(fastlane*)",
+    "hooks": [
+      {
+        "type": "command",
+        "command": "bash -lc 'if [ ! -f .claude/session/ALLOW_MOBILE_RELEASE ]; then echo \"✋ mobile release blocked (set ALLOW_MOBILE_RELEASE)\"; exit 2; fi'"
+      }
+    ]
+  }
+]
