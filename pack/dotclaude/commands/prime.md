@@ -1,7 +1,7 @@
 ---
 description: Prime the session context WITHOUT writing files; keep ≥70% headroom
 argument-hint: [feature-key]
-allowed-tools: Read, Bash(git status*), Bash(git diff --stat*), Bash(git ls-files*), Bash(git grep -n*)
+allowed-tools: Read, Bash(git status:*), Bash(git diff --stat:*), Bash(git ls-files:*), Bash(git grep -n:*)
 ---
 # Input: $1 = feature/task key (optional)
 

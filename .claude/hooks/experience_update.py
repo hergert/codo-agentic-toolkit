@@ -1,9 +1,29 @@
 #!/usr/bin/env python3
 # Append deduped "Experience:" bullets to docs/experience/ledger.md (no external deps)
-import sys, json, os, re, hashlib, datetime, json as js
+import sys, os, re, hashlib, datetime, json
 
-E = js.load(sys.stdin)
+E = json.load(sys.stdin)
 msg = (E.get("message") or "").strip()
+
+# Stop/SubagentStop events do not include a message field; pull from transcript if provided
+if (not msg) and E.get("transcript_path"):
+    try:
+        with open(E["transcript_path"], "r", encoding="utf-8") as tf:
+            entries = [json.loads(line) for line in tf if line.strip()]
+        for entry in reversed(entries):
+            if entry.get("role") != "assistant":
+                continue
+            content = entry.get("content")
+            if isinstance(content, list):
+                chunks = [block.get("text", "") for block in content if block.get("type") == "text"]
+                msg = "\n".join(chunks).strip()
+            elif isinstance(content, str):
+                msg = content.strip()
+            if msg:
+                break
+    except Exception:
+        msg = ""
+
 if not msg or "Experience:" not in msg:
     sys.exit(0)
 
@@ -34,6 +54,7 @@ def redact(s: str) -> str:
     s = re.sub(r'(?i)bearer\s+[A-Za-z0-9._-]+', 'bearer ***', s)
     s = re.sub(r'AKIA[0-9A-Z]{16}', 'AKIA****************', s)  # AWS key
     s = re.sub(r'[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{10,}', '***.***.***', s)  # JWT-ish
+    s = re.sub(r'-----BEGIN [^-]+ PRIVATE KEY-----.*?-----END [^-]+ PRIVATE KEY-----', '-----BEGIN *** PRIVATE KEY-----\n...\n-----END *** PRIVATE KEY-----', s, flags=re.DOTALL)
     return s
 
 os.makedirs("docs/experience", exist_ok=True)
@@ -81,11 +102,13 @@ with open(ledger,"a",encoding="utf-8") as out:
         cache.append((n,s,text)); appended+=1
 
 # keep a tiny tag index for quick lookups
-idx={}
+idx = {}
 if os.path.exists(indexp):
     try:
-        with open(indexp,"r",encoding="utf-8") as f: idx=js.load(f)
-    except Exception: idx={}
+        with open(indexp, "r", encoding="utf-8") as f:
+            idx = json.load(f)
+    except Exception:
+        idx = {}
 for text,tags in cands:
     n=norm(text)
     if not n or not tags: continue
@@ -95,4 +118,5 @@ for text,tags in cands:
         if h not in idx[t]["ids"]: idx[t]["ids"].append(h)
         idx[t]["last_seen"]=ts
         idx[t]["count"]=idx[t].get("count",0)+1
-with open(indexp,"w",encoding="utf-8") as f: js.dump(idx,f,indent=2)
+with open(indexp, "w", encoding="utf-8") as f:
+    json.dump(idx, f, indent=2)

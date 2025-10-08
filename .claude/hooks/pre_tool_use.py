@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import json, sys, os, shlex
+import json, sys, os, shlex, re
 
 E = json.load(sys.stdin)
 tool = E.get("tool_name") or ""
@@ -22,17 +22,18 @@ if bn in BLOCK_BASENAMES or any(s in path for s in BLOCK_DIR_SUBSTR):
     print(f"✋ blocked write to sensitive: {path}", file=sys.stderr)
     sys.exit(2)
 
-# rm -rf guard (allow only inside trees/ for ALL targets)
-if tool.startswith("Bash(") and "rm -rf" in cmd:
+# rm recursive force guard — block any rm with -r and -f (in any order) unless confined to trees/
+if tool.startswith("Bash(") and re.search(r'\brm\b', cmd) and re.search(r'\-(?:[^\s]*r[^\s]*f|[^\s]*f[^\s]*r)', cmd):
     parts = shlex.split(cmd)
-    targets = [p for p in parts if not p.startswith("-") and p not in ("rm",)]
+    targets = [p for p in parts if not p.startswith("-") and p != "rm"]
     if not targets or not all(t.startswith("trees/") and ".." not in t for t in targets):
-        print("✋ rm -rf blocked (restrict to trees/ or use git worktree remove)", file=sys.stderr)
+        print("✋ destructive rm blocked (restrict to trees/ or use git worktree remove)", file=sys.stderr)
         sys.exit(2)
 
-# Commit/PR/tag gate
-if tool.startswith("Bash(git commit") or tool.startswith("Bash(gh pr ") or tool.startswith("Bash(git tag"):
-    print("✋ commits/tags/PR merges are human-only. Use /prepare-commit to stage & draft.", file=sys.stderr)
+# Commit/PR/tag/push gate (anywhere in command)
+lower = cmd.lower()
+if any(x in lower for x in ["git commit", "git tag", "git push", "gh pr create", "gh pr merge"]):
+    print("✋ commits/tags/pushes/PR merges are human-only. Use /prepare-commit to stage & draft.", file=sys.stderr)
     sys.exit(2)
 
 # Cloudflare Workers production deploy gate

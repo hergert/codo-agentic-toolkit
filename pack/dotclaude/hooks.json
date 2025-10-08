@@ -8,8 +8,12 @@
   "PostToolUse": [
     { "matcher": "Edit|MultiEdit|Write", "hooks": [ { "type": "command", "command": "python3 .claude/hooks/post_tool_use.py" } ] }
   ],
-  "Notification": [
-    { "matcher": "Stop|SubagentStop", "hooks": [ { "type": "command", "command": "echo '[Claude] Safety gates → prod: ALLOW_PROD_DEPLOY | DB: ALLOW_DB_MIGRATE | mobile: ALLOW_MOBILE_RELEASE | trigger: ALLOW_TRIGGER_DEPLOY'" } ] },
-    { "matcher": "Stop|SubagentStop", "hooks": [ { "type": "command", "command": "python3 .claude/hooks/experience_update.py" } ] }
+  "Stop": [
+    { "hooks": [ { "type": "command", "command": "echo '[Claude] Safety gates → prod: ALLOW_PROD_DEPLOY | DB: ALLOW_DB_MIGRATE | mobile: ALLOW_MOBILE_RELEASE | trigger: ALLOW_TRIGGER_DEPLOY'" } ] },
+    { "hooks": [ { "type": "command", "command": "python3 .claude/hooks/experience_update.py" } ] }
+  ],
+  "SubagentStop": [
+    { "hooks": [ { "type": "command", "command": "echo '[Claude] Safety gates → prod: ALLOW_PROD_DEPLOY | DB: ALLOW_DB_MIGRATE | mobile: ALLOW_MOBILE_RELEASE | trigger: ALLOW_TRIGGER_DEPLOY'" } ] },
+    { "hooks": [ { "type": "command", "command": "python3 .claude/hooks/experience_update.py" } ] }
   ]
 }

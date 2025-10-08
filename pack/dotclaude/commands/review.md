@@ -1,7 +1,7 @@
 ---
 description: Split-role review (security, readability, tests) → single decision
 argument-hint: [feature-key]
-allowed-tools: Read, Bash(git diff*), Bash(git status*)
+allowed-tools: Read, Bash(git diff:*), Bash(git status:*)
 ---
 1) Compare current diff to `docs/specs/$1-plan.md` acceptance checks and **Golden Rules**.
 2) Run three short passes and consolidate:

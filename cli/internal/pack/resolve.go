@@ -10,11 +10,20 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 )
+
+var httpClient = &http.Client{
+	Timeout: 30 * time.Second,
+}
 
 // headOK checks if a URL is accessible via HEAD request
 func headOK(u string) bool {
-	r, err := http.Head(u)
+	req, err := http.NewRequest(http.MethodHead, u, nil)
+	if err != nil {
+		return false
+	}
+	r, err := httpClient.Do(req)
 	if err != nil {
 		return false
 	}
@@ -25,7 +34,7 @@ func headOK(u string) bool {
 // Resolve downloads and verifies a pack from GitHub releases
 func Resolve(tag string) (string, error) {
 	baseURL := "https://github.com/hergert/codo-agentic-toolkit/releases"
-	
+
 	// Normalize tag for URL construction
 	urlTag := tag
 	if tag == "" || tag == "latest" {
@@ -34,7 +43,7 @@ func Resolve(tag string) (string, error) {
 	} else {
 		urlTag = "download/" + tag
 	}
-	
+
 	// Try both naming patterns: flat names (recommended) and tag-suffixed names (legacy)
 	var packURL, checksumURL string
 	patterns := []struct {
@@ -44,7 +53,7 @@ func Resolve(tag string) (string, error) {
 		{"dotclaude-pack.zip", "dotclaude-pack.sha256"},
 		{fmt.Sprintf("dotclaude-pack-%s.zip", tag), fmt.Sprintf("dotclaude-pack-%s.sha256", tag)},
 	}
-	
+
 	for _, p := range patterns {
 		testPackURL := fmt.Sprintf("%s/%s/%s", baseURL, urlTag, p.zip)
 		testChecksumURL := fmt.Sprintf("%s/%s/%s", baseURL, urlTag, p.sha)
@@ -54,7 +63,7 @@ func Resolve(tag string) (string, error) {
 			break
 		}
 	}
-	
+
 	if packURL == "" {
 		return "", fmt.Errorf("no pack asset found for tag=%s", tag)
 	}
@@ -70,7 +79,7 @@ func Resolve(tag string) (string, error) {
 	}
 
 	zipPath := filepath.Join(cacheDir, "dotclaude-pack.zip")
-	
+
 	// Download pack
 	if err := downloadFile(zipPath, packURL); err != nil {
 		return "", fmt.Errorf("failed to download pack: %w", err)
@@ -109,7 +118,7 @@ func Resolve(tag string) (string, error) {
 }
 
 func downloadFile(filepath string, url string) error {
-	resp, err := http.Get(url)
+	resp, err := httpClient.Get(url)
 	if err != nil {
 		return err
 	}
