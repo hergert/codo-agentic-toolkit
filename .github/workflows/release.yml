@@ -48,6 +48,12 @@ jobs:
           git tag -a "${{ inputs.tag }}" -m "Release ${{ inputs.tag }}"
           git push origin "${{ inputs.tag }}"
 
+      - name: Prepare embedded pack
+        run: |
+          cd cli
+          rm -rf .embedded_pack
+          cp -r ../pack .embedded_pack
+
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
