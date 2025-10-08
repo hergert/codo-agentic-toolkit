@@ -20,4 +20,4 @@ allowed-tools: Read, Bash(git status*), Bash(git diff --stat*), Bash(git ls-file
 # Slim tokens
 4) Run `/context` and propose exactly what to unload/summarize to keep ≥70% free
    (unused agents, long memory sections, large messages). DO NOT write any files.
-5) If a map or plan is missing/outdated, suggest `/map "$1"` or `/plan "$1"`—do not create them.
+5) If a scope plan is missing/outdated, suggest `/scope "$1"`—do not create it yourself.

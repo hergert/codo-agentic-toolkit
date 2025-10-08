@@ -20,11 +20,9 @@ Standardize and optimize Claude commands following Anthropic's agentic coding gu
 
 ### Phase 1: Command Structure Standardization (Low Risk)
 **Files to modify:**
-- `pack/dotclaude/commands/map.md`
-- `pack/dotclaude/commands/plan.md`
-- `pack/dotclaude/commands/prime-context.md`
-- `pack/dotclaude/commands/implement.md`
-- `pack/dotclaude/commands/tests.md`
+- `pack/dotclaude/commands/scope.md`
+- `pack/dotclaude/commands/build.md`
+- `pack/dotclaude/commands/prime.md`
 - `pack/dotclaude/commands/review.md`
 
 **Changes:**
@@ -99,7 +97,7 @@ codo update --to stable
 ```
 
 ## Acceptance Criteria
-- [ ] All 6 commands have argument-hint and minimal allowed-tools
+- [ ] All core commands (`/scope`, `/prime`, `/build`, `/review`) have argument-hint and minimal allowed-tools
 - [ ] Token limits enforced (≤350 tokens per command output)
 - [ ] Commands follow Read → Process → Report flow
 - [ ] Settings reflect correct gate precedence

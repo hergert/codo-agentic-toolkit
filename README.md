@@ -56,3 +56,12 @@ The toolkit provides:
 - Hooks as safety gates
 - Settings for plan-by-default mode
 - Output styles to switch personas
+
+## Codo agentic loop (minimal)
+1) `/scope "<key>"`      # map + plan in one file; stop for approval
+2) `/prime "<key>"`      # context preflight (status, include list, keep ≥70% headroom)
+3) `/build "<key>"`      # contract tests → smallest diff → green
+4) `/review "<key>"`     # split-role review → APPROVE / REQUEST-CHANGES
+(5) `/prepare-commit`    # stage & draft message (no push)
+
+Golden Rules still apply: YAGNI, KISS, smallest diff, contract tests only, and no commits or deploys by Claude.
