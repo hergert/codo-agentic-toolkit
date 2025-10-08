@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import json, sys, os, shlex, re
+from datetime import datetime, timedelta
 
 E = json.load(sys.stdin)
 tool = E.get("tool_name") or ""
@@ -7,9 +8,65 @@ ti = E.get("tool_input") or {}
 cmd = ti.get("command", "")
 path = (ti.get("file_path") or "")
 
+SENSITIVE_NAMES = {
+    ".env",
+    ".env.local",
+    ".env.production",
+    ".env.development",
+    "id_rsa",
+    "id_ed25519",
+    "known_hosts",
+    "serviceAccountKey.json",
+    "GoogleService-Info.plist",
+    "google-services.json",
+}
+SENSITIVE_DIR_SUBSTR = ("/.git/", "/config/secrets/")
+
+if tool == "Read":
+    base = os.path.basename(path)
+    if base in SENSITIVE_NAMES or any(sub in path for sub in SENSITIVE_DIR_SUBSTR):
+        out = {
+            "hookSpecificOutput": {
+                "hookEventName": "PreToolUse",
+                "permissionDecision": "ask",
+                "permissionDecisionReason": f"Read of sensitive path: {path}"
+            }
+        }
+        print(json.dumps(out))
+        sys.exit(0)
+
 # Allow docs/.claude edits always
 if tool in ("Edit","Write","MultiEdit") and (path.startswith("docs/") or path.startswith(".claude/")):
     sys.exit(0)
+
+def has_fresh_plan(hours: int = 48) -> bool:
+    specs_dir = os.path.join("docs", "specs")
+    if not os.path.isdir(specs_dir):
+        return False
+    cutoff = datetime.utcnow() - timedelta(hours=hours)
+    for entry in os.listdir(specs_dir):
+        if not entry.endswith("-plan.md"):
+            continue
+        candidate = os.path.join(specs_dir, entry)
+        try:
+            mtime = os.path.getmtime(candidate)
+        except OSError:
+            continue
+        if datetime.utcfromtimestamp(mtime) >= cutoff:
+            return True
+    return False
+
+if tool in ("Edit","Write","MultiEdit") and not (path.startswith("docs/") or path.startswith(".claude/")):
+    if not has_fresh_plan():
+        out = {
+            "hookSpecificOutput": {
+                "hookEventName": "PreToolUse",
+                "permissionDecision": "ask",
+                "permissionDecisionReason": "No recent plan in docs/specs/*-plan.md (≤48h). Proceed only if this is a trivial fix."
+            }
+        }
+        print(json.dumps(out))
+        sys.exit(0)
 
 # Secrets / sensitive paths guard
 bn = os.path.basename(path)
@@ -40,24 +97,28 @@ if any(x in lower for x in ["git commit", "git tag", "git push", "gh pr create",
 if "wrangler deploy --env production" in cmd:
     if not os.path.exists(".claude/session/ALLOW_PROD_DEPLOY"):
         print("✋ production deploy blocked (set ALLOW_PROD_DEPLOY)", file=sys.stderr)
+        print("Create the gate file: `mkdir -p .claude/session && touch .claude/session/ALLOW_PROD_DEPLOY`", file=sys.stderr)
         sys.exit(2)
 
 # Supabase DB migrate/reset gate
 if cmd.startswith("supabase db reset") or cmd.startswith("supabase db push"):
     if not os.path.exists(".claude/session/ALLOW_DB_MIGRATE"):
         print("✋ Supabase DB migration/reset blocked (set ALLOW_DB_MIGRATE)", file=sys.stderr)
+        print("Create the gate file: `mkdir -p .claude/session && touch .claude/session/ALLOW_DB_MIGRATE`", file=sys.stderr)
         sys.exit(2)
 
 # trigger.dev deploy gate
 if cmd.startswith("npx trigger.dev deploy") or cmd.startswith("npx @trigger.dev/cli deploy"):
     if not os.path.exists(".claude/session/ALLOW_TRIGGER_DEPLOY"):
         print("✋ trigger.dev deploy blocked (set ALLOW_TRIGGER_DEPLOY)", file=sys.stderr)
+        print("Create the gate file: `mkdir -p .claude/session && touch .claude/session/ALLOW_TRIGGER_DEPLOY`", file=sys.stderr)
         sys.exit(2)
 
 # Flutter / Mobile release gate
 if cmd.startswith("fastlane") or cmd.startswith("flutter build ipa") or cmd.startswith("flutter build appbundle"):
     if not os.path.exists(".claude/session/ALLOW_MOBILE_RELEASE"):
         print("✋ mobile release blocked (set ALLOW_MOBILE_RELEASE)", file=sys.stderr)
+        print("Create the gate file: `mkdir -p .claude/session && touch .claude/session/ALLOW_MOBILE_RELEASE`", file=sys.stderr)
         sys.exit(2)
 
 sys.exit(0)

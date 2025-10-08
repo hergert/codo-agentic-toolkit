@@ -23,6 +23,7 @@ Think → Plan (pseudo‑code) → **Show & confirm** → Implement → Tests gr
 
 ## Conventions
 
+- Default model: **Claude 3.5 Sonnet**. For thorny planning spikes run `/model opusplan`, then switch back to Sonnet before writing code.
 - Prefer small, surgical diffs with clear rationale.
 - Document only what’s necessary to make reviews effective (spec, plan, tests, risk notes).
 - Contract tests only; keep the suite fast and lean.

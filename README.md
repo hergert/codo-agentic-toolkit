@@ -42,6 +42,8 @@ codo self-update
 # status & doctor
 codo status
 codo doctor
+
+Run `codo doctor` after `codo init` to confirm hooks are executable and Python 3 is available.
 ```
 
 ## What gets installed

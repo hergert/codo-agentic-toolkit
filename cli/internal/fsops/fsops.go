@@ -37,7 +37,6 @@ func CopySafe(f pack.File, projectRoot string, dry bool) error {
 
 	if _, err := os.Stat(dst); err == nil {
 		tmp := dst + ".codo.new"
-		// Only write .codo.new if different
 		curHash, err := sha256File(dst)
 		if err != nil {
 			return fmt.Errorf("hash current file %s: %w", dst, err)
@@ -51,6 +50,7 @@ func CopySafe(f pack.File, projectRoot string, dry bool) error {
 		if dry {
 			return nil
 		}
+		appendReport("conflicts.txt", tmp)
 		return os.WriteFile(tmp, srcBytes, 0o644)
 	}
 
@@ -66,6 +66,7 @@ func ChmodHooks() error {
 		filepath.Join(".claude", "hooks", "pre_tool_use.py"),
 		filepath.Join(".claude", "hooks", "post_tool_use.py"),
 		filepath.Join(".claude", "hooks", "user_prompt_submit.py"),
+		filepath.Join(".claude", "hooks", "experience_update.py"),
 	}
 	for _, p := range files {
 		if _, err := os.Stat(p); err == nil {

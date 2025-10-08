@@ -41,6 +41,8 @@
       "Edit(/**/deploy/**)",
       "Bash(git commit:*)",
       "Bash(git tag:*)",
+      "Bash(git push --force:*)",
+      "Bash(git push --tags:*)",
       "Bash(git push:*)",
       "Bash(gh pr create:*)",
       "Bash(gh pr merge:*)"

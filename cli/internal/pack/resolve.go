@@ -25,7 +25,12 @@ func headOK(u string) bool {
 	}
 	r, err := httpClient.Do(req)
 	if err != nil {
-		return false
+		gr, gerr := httpClient.Get(u)
+		if gerr != nil {
+			return false
+		}
+		gr.Body.Close()
+		return gr.StatusCode == http.StatusOK
 	}
 	r.Body.Close()
 	return r.StatusCode == http.StatusOK

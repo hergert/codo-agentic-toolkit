@@ -47,3 +47,8 @@ tar -xzf "$ASSET" codo
 install -m 0755 codo "$BIN_DIR/codo"
 echo "✅ codo installed to $BIN_DIR/codo"
 "$BIN_DIR/codo" version || true
+if ! command -v codo >/dev/null 2>&1; then
+  echo ""
+  echo "Add to PATH (bash/zsh):"
+  echo "  export PATH=\"\$PATH:$BIN_DIR\""
+fi

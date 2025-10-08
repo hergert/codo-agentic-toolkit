@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/hergert/codo-agentic-toolkit/cli/internal/fsops"
 	"github.com/hergert/codo-agentic-toolkit/cli/internal/manifest"
 	"github.com/hergert/codo-agentic-toolkit/cli/internal/pack"
 	"github.com/spf13/cobra"
@@ -106,6 +107,7 @@ var updateCmd = &cobra.Command{
 					note := dst + ".codo.removed.suggested"
 					fmt.Println("! modified & removed upstream → " + note)
 					if !updateDry {
+						fsops.AppendReportHook(note)
 						msg := []byte("Upstream removed this file, but you have local changes.\nConsider removing it manually if no longer needed.\n")
 						if err := os.WriteFile(note, msg, 0o644); err != nil {
 							return err
@@ -141,6 +143,7 @@ var updateCmd = &cobra.Command{
 				out := dst + ".codo.new"
 				fmt.Println("! conflict → " + out)
 				if !updateDry {
+					fsops.AppendReportHook(out)
 					if err := os.WriteFile(out, nb, 0o644); err != nil {
 						return err
 					}
