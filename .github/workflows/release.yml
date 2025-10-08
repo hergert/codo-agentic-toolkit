@@ -55,10 +55,7 @@ jobs:
           args: release --clean
           workdir: ./cli
         env:
-          # Default token works for releases in the same repo.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # If your Homebrew tap / Scoop bucket / Winget repo are separate, provide a PAT instead:
-          # GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
 
       - name: Package dotclaude pack asset
         run: |

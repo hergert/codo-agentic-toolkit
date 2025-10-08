@@ -33,35 +33,3 @@ release:
   draft: false
   prerelease: false
 
-homebrew_casks:
-  - name: codo
-    repository:
-      owner: hergert
-      name: homebrew-tap
-    commit_author:
-      name: hergert
-      email: you@example.com
-    directory: Casks
-    homepage: "https://github.com/hergert/codo-agentic-toolkit"
-    description: "CLI to manage the Codo Agentic Toolkit."
-    install: |
-      bin.install "codo"
-
-scoops:
-  - name: codo
-    repository:
-      owner: hergert
-      name: scoop-bucket
-    homepage: "https://github.com/hergert/codo"
-    description: "Modern CLI to manage the Codo Agentic Toolkit."
-
-winget:
-  - name: codo
-    publisher: "Codo Team"
-    package_identifier: hergert.codo
-    short_description: "Modern CLI to manage the Codo Agentic Toolkit."
-    homepage: "https://github.com/hergert/codo"
-    repository:
-      owner: hergert
-      name: winget-pkgs
-

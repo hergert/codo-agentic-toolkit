@@ -4,17 +4,10 @@ Install the Codo CLI and manage the **dotclaude** pack in any repo.
 
 ## Install
 
-### One-liner (macOS/Linux)
 ```bash
-curl -fsSL https://raw.githubusercontent.com/hergert/codo-agentic-toolkit/main/dist/codo-install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/hergert/codo-agentic-toolkit/main/scripts/install.sh | bash
 ```
 This downloads the latest release from GitHub, verifies SHA256 checksums, and installs `codo` to `~/.local/bin`.
-
-### Homebrew (optional)
-```bash
-brew tap hergert/homebrew-tap
-brew install hergert/homebrew-tap/codo
-```
 
 ### Shell completion
 ```bash
