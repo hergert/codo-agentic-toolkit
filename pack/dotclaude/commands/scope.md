@@ -1,5 +1,5 @@
 ---
-description: Scope a change end-to-end (map → plan) in one pass; stop for approval
+description: Scope a change end-to-end (map → plan) in one pass; stop for human review
 argument-hint: [feature-key]
 allowed-tools: Read, Edit, Bash(git ls-files*), Bash(git grep -n*), Bash(find *)
 ---
@@ -15,4 +15,4 @@ allowed-tools: Read, Edit, Bash(git ls-files*), Bash(git grep -n*), Bash(find *)
    - **Risks**: perf/migrations/breakage + detection method.
    - **Test strategy**: contract tests only to prove behavior (list files/functions).
    - **Out of scope**: enforce YAGNI.
-3) Stop. Ask for human approval (`/approve "$1"`) before any edits.
+3) Stop. Wait for human review in chat before any edits.

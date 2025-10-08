@@ -163,7 +163,7 @@ echo "✅ codo installed to $BIN_DIR/codo"
 ```json
 // .claude/settings.json & dotclaude/.claude/base/settings.json
 - "note": "Commits/PR merges/prod deploys blocked. Exit gate: green tests"
-+ "note": "Commits/PRs ask (gated by ALLOW_COMMITS/FAST_MODE). Production deploys ask (gated by ALLOW_PROD_DEPLOY). Exit gate: tests green."
++ "note": "Source edits require explicit confirmation (ask). Commits/tags/PR merges are denied (human only). High-risk ops gated individually (ALLOW_PROD_DEPLOY / ALLOW_DB_MIGRATE / ALLOW_MOBILE_RELEASE / ALLOW_TRIGGER_DEPLOY). Exit gate: tests green."
 ```
 
 ### Secrets guard improvements

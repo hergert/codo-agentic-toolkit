@@ -39,7 +39,7 @@ Standardize and optimize Claude commands following Anthropic's agentic coding gu
 - `pack/dotclaude/settings.local.json` (if exists)
 
 **Changes:**
-- Update notes field to clarify ALLOW_EDITS/FAST_MODE gates
+- Update notes field to clarify explicit edit confirmation and high-risk deploy gates
 - Remove invalid patterns from settings.local.json
 - Align with Claude Code's settings precedence
 

@@ -75,10 +75,10 @@ Guidance by ecosystem:
 
 ## Guardrails & Permissions
 
-- Auto‑plan: require `.claude/session/ALLOW_EDITS` marker before source edits.
+- Claude never commits or deploys; source edits are always confirmed interactively—approve or deny when prompted.
+- High-risk toggles stay explicit: `ALLOW_PROD_DEPLOY`, `ALLOW_DB_MIGRATE`, `ALLOW_MOBILE_RELEASE`, `ALLOW_TRIGGER_DEPLOY`.
 - Deny writes to secrets/lockfiles/VCS internals/deploy manifests by default.
 - Treat installation/network access as high‑risk; require explicit approval.
-- Block commits/PR merges/prod deploys by default; let humans drive these.
 
 ## Review & Change Management
 

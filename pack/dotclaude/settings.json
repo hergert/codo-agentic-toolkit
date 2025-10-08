@@ -13,9 +13,9 @@
     { "tool": "Bash(mvn test*)|Bash(gradle test*)", "policy": "allow" },
     { "tool": "Bash(flutter test*)", "policy": "allow" },
 
-    { "tool": "Bash(git commit*)|Bash(git tag*)|Bash(gh pr create*)|Bash(gh pr merge*)", "policy": "ask" },
+    { "tool": "Bash(git commit*)|Bash(git tag*)|Bash(gh pr create*)|Bash(gh pr merge*)", "policy": "deny" },
     { "tool": "Bash(npx wrangler deploy --env production*)|Bash(wrangler deploy --env production*)", "policy": "ask" },
     { "tool": "Bash(npx wrangler deploy*)|Bash(wrangler deploy*)|Bash(npx wrangler dev*)", "policy": "ask" }
   ],
-  "notes": "Auto-plan: source edits require .claude/session/ALLOW_EDITS (or FAST_MODE). Commits/PRs ask (gated by ALLOW_COMMITS/FAST_MODE). Prod deploys ask (gated by ALLOW_PROD_DEPLOY). Exit gate: tests green."
+  "notes": "Source edits require explicit confirmation (ask). Commits/tags/PR merges are denied (human only). High-risk ops gated individually (ALLOW_PROD_DEPLOY / ALLOW_DB_MIGRATE / ALLOW_MOBILE_RELEASE / ALLOW_TRIGGER_DEPLOY). Exit gate: tests green."
 }

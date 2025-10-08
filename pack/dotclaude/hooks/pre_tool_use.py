@@ -11,13 +11,6 @@ path = (ti.get("file_path") or "")
 if tool in ("Edit","Write","MultiEdit") and (path.startswith("docs/") or path.startswith(".claude/")):
     sys.exit(0)
 
-# Fast Mode or plan-approved gate for source edits
-fast  = os.path.exists(".claude/session/FAST_MODE")
-approved = os.path.exists(".claude/session/ALLOW_EDITS")
-if tool in ("Edit","Write","MultiEdit") and not (fast or approved):
-    print("✋ edits blocked: /approve <task> or /fast-on", file=sys.stderr)
-    sys.exit(2)
-
 # Secrets / sensitive paths guard
 bn = os.path.basename(path)
 BLOCK_BASENAMES = {".env", ".env.local", ".env.production", ".env.development",
@@ -39,9 +32,8 @@ if tool.startswith("Bash(") and "rm -rf" in cmd:
 
 # Commit/PR/tag gate
 if tool.startswith("Bash(git commit") or tool.startswith("Bash(gh pr ") or tool.startswith("Bash(git tag"):
-    if not (fast or os.path.exists(".claude/session/ALLOW_COMMITS")):
-        print("✋ commits/tags/PR merges are human-only (use /fast-on commits or set ALLOW_COMMITS)", file=sys.stderr)
-        sys.exit(2)
+    print("✋ commits/tags/PR merges are human-only. Use /prepare-commit to stage & draft.", file=sys.stderr)
+    sys.exit(2)
 
 # Cloudflare Workers production deploy gate
 if "wrangler deploy --env production" in cmd:
