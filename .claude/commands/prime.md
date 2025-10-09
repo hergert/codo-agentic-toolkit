@@ -15,6 +15,7 @@ allowed-tools: Read, Bash(git status:*), Bash(git diff --stat:*), Bash(git ls-fi
      (rank by tag/path overlap with "$1" and recency).
 3) Build a one-screen TL;DR (≤200 tokens) with:
    - What we're solving now, the top 3 files to open next, and the risks to watch.
+   - A TSH-driven “candidate tests” sketch (3–7), each tied to a real invariant.
    - A proposed "include list" (max 20 files) for subsequent steps.
 
 # Slim tokens

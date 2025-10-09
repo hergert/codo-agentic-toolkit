@@ -27,3 +27,9 @@ Think → Plan (pseudo‑code) → **Show & confirm** → Implement → Tests gr
 - Prefer small, surgical diffs with clear rationale.
 - Document only what’s necessary to make reviews effective (spec, plan, tests, risk notes).
 - Contract tests only; keep the suite fast and lean.
+
+### Test Selection Heuristic (TSH)
+- Write **3–7** high-signal tests per change.
+- Test **contracts & risky logic** (branching/state/concurrency/parsing/security/cross-module), not the framework.
+- Avoid trivial HTTP status/JSON-shape tests unless behavior is custom.
+- Each test defends an invariant users care about; if a small mutation would slip through, add one targeted test.
