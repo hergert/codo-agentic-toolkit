@@ -4,12 +4,8 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Semver tag to release (e.g., v0.1.0). Leave blank to use current tag run."
+        description: "Semver tag to release (e.g., v1.0.0 for major). Leave blank to auto-increment patch version."
         required: false
-      create_tag:
-        description: "Create and push the tag before releasing?"
-        type: boolean
-        default: true
   push:
     tags:
       - "v*"
@@ -40,13 +36,38 @@ jobs:
           cache: true
           cache-dependency-path: cli/go.sum
 
-      - name: Create tag (if requested via dispatch)
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.create_tag == true && inputs.tag != '' }}
+      - name: Determine next version
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        id: version
         run: |
           git config user.name "codo-bot"
           git config user.email "actions@users.noreply.github.com"
-          git tag -a "${{ inputs.tag }}" -m "Release ${{ inputs.tag }}"
-          git push origin "${{ inputs.tag }}"
+
+          if [ -n "${{ inputs.tag }}" ]; then
+            # Use provided tag
+            NEW_TAG="${{ inputs.tag }}"
+          else
+            # Auto-increment patch version
+            LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+            echo "Latest tag: $LATEST_TAG"
+
+            # Extract version numbers (strip 'v' prefix)
+            VERSION=${LATEST_TAG#v}
+            MAJOR=$(echo $VERSION | cut -d. -f1)
+            MINOR=$(echo $VERSION | cut -d. -f2)
+            PATCH=$(echo $VERSION | cut -d. -f3)
+
+            # Increment patch
+            PATCH=$((PATCH + 1))
+            NEW_TAG="v${MAJOR}.${MINOR}.${PATCH}"
+          fi
+
+          echo "New tag: $NEW_TAG"
+          echo "tag=$NEW_TAG" >> $GITHUB_OUTPUT
+
+          # Create and push tag
+          git tag -a "$NEW_TAG" -m "Release $NEW_TAG"
+          git push origin "$NEW_TAG"
 
       - name: Prepare embedded pack
         run: |
