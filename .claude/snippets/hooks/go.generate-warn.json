@@ -2,8 +2,10 @@
   {
     "matcher": "Bash(go generate*)",
     "hooks": [
-      { "type": "command", "command": "bash -lc 'echo \"⚠️ go generate can be broad; ensure it is scoped.\"; exit 0'" }
+      {
+        "type": "command",
+        "command": "echo \"⚠️  Warning: go generate may modify files. Review changes carefully.\""
+      }
     ]
   }
 ]
-

@@ -12,7 +12,7 @@ if f and os.path.exists(f):
             "-lc",
             f"command -v goimports >/dev/null 2>&1 && goimports -w {shlex.quote(f)} || go fmt {shlex.quote(f)}"
         ])
-    elif f.endswith((".ts",".tsx",".js",".jsx")):
+    elif f.endswith((".ts", ".tsx", ".js", ".jsx")):
         subprocess.call(["bash","-lc", f"command -v npx >/dev/null 2>&1 && npx -y prettier --write {shlex.quote(f)} || true"])
         subprocess.call(["bash","-lc", f"command -v npx >/dev/null 2>&1 && npx -y eslint --fix {shlex.quote(f)} || true"])
     elif f.endswith(".py"):

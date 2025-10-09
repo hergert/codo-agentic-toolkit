@@ -2,8 +2,10 @@
   {
     "matcher": "Bash(npx wrangler deploy --env production*)|Bash(wrangler deploy --env production*)",
     "hooks": [
-      { "type": "command", "command": "bash -lc 'if [ ! -f .claude/session/ALLOW_PROD_DEPLOY ]; then echo \"✋ production deploy blocked (set ALLOW_PROD_DEPLOY)\"; exit 2; fi'" }
+      {
+        "type": "command",
+        "command": "bash -lc 'if [ ! -f .claude/session/ALLOW_PROD_DEPLOY ]; then echo \"✋ production deploy blocked (set ALLOW_PROD_DEPLOY)\"; exit 2; fi'"
+      }
     ]
   }
 ]
-

@@ -5,6 +5,7 @@ import sys, os, re, hashlib, datetime, json
 E = json.load(sys.stdin)
 msg = (E.get("message") or "").strip()
 
+# Stop/SubagentStop events do not include a message field; pull from transcript if provided
 if (not msg) and E.get("transcript_path"):
     try:
         with open(E["transcript_path"], "r", encoding="utf-8") as tf:

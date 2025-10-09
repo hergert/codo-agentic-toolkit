@@ -1,9 +1,11 @@
 [
   {
-    "matcher": "Bash(supabase db reset*)|Bash(supabase db push*)",
+    "matcher": "Bash(supabase db push*)|Bash(supabase migration*)",
     "hooks": [
-      { "type": "command", "command": "bash -lc 'if [ ! -f .claude/session/ALLOW_DB_MIGRATE ]; then echo \"✋ Supabase DB migration/reset blocked (set ALLOW_DB_MIGRATE)\"; exit 2; fi'" }
+      {
+        "type": "command",
+        "command": "bash -lc 'if [ ! -f .claude/session/ALLOW_DB_MIGRATE ]; then echo \"✋ database migration blocked (set ALLOW_DB_MIGRATE)\"; exit 2; fi'"
+      }
     ]
   }
 ]
-

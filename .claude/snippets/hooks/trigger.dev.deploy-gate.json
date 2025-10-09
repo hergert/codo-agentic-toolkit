@@ -1,9 +1,11 @@
 [
   {
-    "matcher": "Bash(npx trigger.dev deploy*)|Bash(npx @trigger.dev/cli deploy*)",
+    "matcher": "Bash(trigger deploy*)|Bash(npx trigger.dev deploy*)",
     "hooks": [
-      { "type": "command", "command": "bash -lc 'if [ ! -f .claude/session/ALLOW_TRIGGER_DEPLOY ]; then echo \"✋ trigger.dev deploy blocked (set ALLOW_TRIGGER_DEPLOY)\"; exit 2; fi'" }
+      {
+        "type": "command",
+        "command": "bash -lc 'if [ ! -f .claude/session/ALLOW_TRIGGER_DEPLOY ]; then echo \"✋ trigger.dev deploy blocked (set ALLOW_TRIGGER_DEPLOY)\"; exit 2; fi'"
+      }
     ]
   }
 ]
-
