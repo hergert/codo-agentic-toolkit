@@ -1,5 +1,5 @@
 ---
-description: Write only the minimal change needed to make contract tests green (tests → code → rerun)
+description: Execute the minimal change needed to make contract tests green (tests → code → rerun)
 argument-hint: [feature-key]
 allowed-tools: Read, Edit, MultiEdit,
   Bash(go test ./...), Bash(pnpm test*), Bash(npm test*), Bash(yarn test*), Bash(bun test*), Bash(vitest*),

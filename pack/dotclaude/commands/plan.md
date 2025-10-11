@@ -1,5 +1,5 @@
 ---
-description: Scope a change end-to-end (map → plan) in one pass; stop for human review
+description: Plan a change end-to-end (map → plan) in one pass; stop for human review
 argument-hint: [feature-key]
 allowed-tools: Read, Edit, Bash(git ls-files:*), Bash(git grep -n:*), Bash(find :*)
 ---

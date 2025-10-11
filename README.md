@@ -53,9 +53,9 @@ The toolkit provides:
 - Output styles to switch personas
 
 ## Codo agentic loop (minimal)
-1) `/scope "<key>"`      # map + plan in one file; stop for human review
+1) `/plan "<key>"`       # map + plan in one file; stop for human review
 2) `/prime "<key>"`      # context preflight (status, include list, keep ≥70% headroom)
-3) `/build "<key>"`      # contract tests → smallest diff → green
+3) `/execute "<key>"`    # contract tests → smallest diff → green
 4) `/review "<key>"`     # split-role review → APPROVE / REQUEST-CHANGES
 (5) `/prepare-commit`    # stage & draft message (never commits; you commit & push)
 
