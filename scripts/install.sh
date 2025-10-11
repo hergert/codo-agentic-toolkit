@@ -87,7 +87,7 @@ else
   echo "✅ codo built from source at $BIN_DIR/codo"
 fi
 
-"$BIN_DIR/codo" version || true
+"$BIN_DIR/codo" --version || true
 if ! command -v codo >/dev/null 2>&1; then
   echo ""
   echo "Add to PATH (bash/zsh):"
