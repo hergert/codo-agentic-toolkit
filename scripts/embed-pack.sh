@@ -13,20 +13,31 @@ fi
 python3 - "$PACK_DIR" "$TARGET" <<'PY'
 import os, sys, zipfile
 
+EPOCH = (1980, 1, 1, 0, 0, 0)
+FILE_MODE = 0o100644 << 16
+DIR_MODE = 0o040755 << 16
+
 pack_dir = sys.argv[1]
 target = sys.argv[2]
 os.makedirs(os.path.dirname(target), exist_ok=True)
 with zipfile.ZipFile(target, 'w', zipfile.ZIP_DEFLATED) as z:
     for base, dirs, files in os.walk(pack_dir):
+        dirs.sort()
+        files.sort()
         rel_dir = os.path.relpath(base, pack_dir)
         if rel_dir != '.':
             zinfo = zipfile.ZipInfo(rel_dir.rstrip('/') + '/')
-            zinfo.external_attr = 0o755 << 16
-            z.writestr(zinfo, '')
+            zinfo.date_time = EPOCH
+            zinfo.external_attr = DIR_MODE
+            z.writestr(zinfo, b'')
         for name in files:
             full = os.path.join(base, name)
             rel = os.path.relpath(full, pack_dir)
-            z.write(full, arcname=rel)
+            zinfo = zipfile.ZipInfo(rel)
+            zinfo.date_time = EPOCH
+            zinfo.external_attr = FILE_MODE
+            with open(full, 'rb') as fh:
+                z.writestr(zinfo, fh.read())
 PY
 
 echo "Embedded pack refreshed at $TARGET"
