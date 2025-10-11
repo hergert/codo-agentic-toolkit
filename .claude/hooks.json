@@ -17,9 +17,14 @@
   ],
 
   "Stop": [
-    { "hooks": [ { "type": "command", "command": "python3 .claude/hooks/experience_update.py" } ] }
+    { "hooks": [ { "type": "command", "command": "python3 .claude/hooks/after_stop_hint.py" } ] }
   ],
   "SubagentStop": [
-    { "hooks": [ { "type": "command", "command": "python3 .claude/hooks/experience_update.py" } ] }
+    { "hooks": [ { "type": "command", "command": "python3 .claude/hooks/after_stop_hint.py" } ] }
+  ],
+
+  "Notification": [
+    { "matcher": "Stop|SubagentStop", "hooks": [ { "type": "command", "command": "echo '[Claude] Safety gates → prod: ALLOW_PROD_DEPLOY | DB: ALLOW_DB_MIGRATE | mobile: ALLOW_MOBILE_RELEASE | trigger: ALLOW_TRIGGER_DEPLOY'" } ] },
+    { "matcher": "Stop|SubagentStop", "hooks": [ { "type": "command", "command": "python3 .claude/hooks/experience_update.py" } ] }
   ]
 }

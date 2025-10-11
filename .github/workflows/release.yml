@@ -72,7 +72,7 @@ jobs:
       - name: Prepare embedded pack & smoke build
         run: |
           ./scripts/embed-pack.sh
-          go build -o /tmp/codo ./cli
+          go -C cli build -o /tmp/codo .
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
