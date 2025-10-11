@@ -1,9 +1,10 @@
-feat(scope): one‑line intent
+<type>(scope): short, specific summary
 
 Why
--
-How
--
-Tests
--
+- <single most important reason>
 
+What
+- <2–5 bullets of meaningful changes>
+
+Tests
+- <how verified or N/A>

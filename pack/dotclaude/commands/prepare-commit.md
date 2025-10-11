@@ -1,7 +1,20 @@
 ---
 description: Stage touched files and draft a commit message (no push)
-allowed-tools: Bash(git add:*), Bash(git status:*), Bash(git diff --staged:*), Edit
+allowed-tools: Bash(git add:*), Bash(git status:*), Bash(git diff --staged:*), Bash(git commit -F*), Bash(cat*), Bash(mkdir -p*)
 ---
-1) Stage explicit paths from the plan or last diff; avoid lockfiles and large generated assets.
-2) Draft the commit message using @.claude/templates/commit_message_template.txt and print for review.
-3) Print a **Run manually** banner that includes the commit message and the exact commands for the human to run (e.g. `git commit -F /tmp/commit-msg.txt && git push`).
+1) Stage explicit paths from the plan or last diff (avoid lockfiles/generated assets).
+
+2) Draft the commit message from @.claude/templates/commit_message_template.txt.
+   - Keep it concise and action-oriented (no generated footers).
+   - Save it to `.claude/.session-commit-message.txt` and show it:
+
+   !`mkdir -p .claude >/dev/null 2>&1 || true`
+   !`MSG_PATH=".claude/.session-commit-message.txt" && echo "$MSG_PATH"`
+   (Claude: write the message into `$MSG_PATH`, then)
+   !`cat .claude/.session-commit-message.txt`
+
+3) If commits are allowed (marker present), run:
+   - `git commit -F .claude/.session-commit-message.txt`
+   Otherwise:
+   - Print instructions for manual commit:  
+     `git commit -F .claude/.session-commit-message.txt`

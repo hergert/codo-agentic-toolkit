@@ -3,6 +3,8 @@ description: Distill the session's learning (no writes). Run built-in /compact s
 argument-hint: [feature-key]
 allowed-tools: Read
 ---
+Aim for 2–4 bullets max; each bullet ≤25 words; prefer action verbs and concrete heuristics.
+
 # Experience distiller (no writes)
 Summarize this session as ≤120 tokens. Then propose **0–5 bullets** worth remembering long-term, or say "nothing learned".
 Each bullet must be:
