@@ -49,7 +49,6 @@ snapshot:
 # Clean build artifacts
 clean:
     @rm -rf dist
-    @rm -rf cli/.embedded_pack
 
 # === Development Tools ===
 

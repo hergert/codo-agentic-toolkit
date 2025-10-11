@@ -38,9 +38,6 @@ coverage*.out
 # Build output (single location at repo root)
 /dist/
 
-# Temporary embed directory during build
-cli/.embedded_pack
-
 # Codo toolkit artifacts
 .codo-backup/
 *.codo.new

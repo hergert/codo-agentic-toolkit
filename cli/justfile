@@ -7,18 +7,15 @@ default:
 # Build the binary with embedded content (output to repo root dist/)
 build:
     @echo "Building codo with embedded pack..."
-    @rm -rf .embedded_pack
-    @cp -r ../pack .embedded_pack
+    @../scripts/embed-pack.sh >/dev/null
     @mkdir -p ../dist
     @go build -o ../dist/codo .
-    @rm -rf .embedded_pack
     @echo "✅ Built ../dist/codo"
 
 # Clean build artifacts
 clean:
     @echo "Cleaning..."
     @rm -rf ../dist
-    @rm -rf .embedded_pack
 
 # Install to ~/.local/bin
 install: build
@@ -33,14 +30,17 @@ dev: build
 
 # Run tests
 test:
+    @../scripts/embed-pack.sh >/dev/null
     go test ./...
 
 # Run tests with race detector
 test-race:
+    @../scripts/embed-pack.sh >/dev/null
     go test -race ./...
 
 # Run go vet
 vet:
+    @../scripts/embed-pack.sh >/dev/null
     go vet ./...
 
 # Format code

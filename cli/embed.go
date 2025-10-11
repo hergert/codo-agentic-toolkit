@@ -1,17 +1,26 @@
 package main
 
 import (
-	"embed"
+	"archive/zip"
+	"bytes"
 	"io/fs"
+
+	_ "embed"
 )
 
-// embeddedPack embeds the pack directory that is temporarily copied during build
-// The build process copies ../pack to cli/.embedded_pack
+// embeddedPackZip stores a zipped copy of the base pack for offline installs.
 //
-//go:embed all:.embedded_pack
-var embeddedPack embed.FS
+//go:embed internal/pack/embedded_base.zip
+var embeddedPackZip []byte
 
-// GetEmbeddedPack returns the embedded pack filesystem for use by internal packages
+// GetEmbeddedPack returns the embedded pack as an fs.FS backed by the zip archive.
 func GetEmbeddedPack() (fs.FS, error) {
-	return fs.Sub(embeddedPack, ".embedded_pack")
+	if len(embeddedPackZip) == 0 {
+		return nil, fs.ErrNotExist
+	}
+	reader, err := zip.NewReader(bytes.NewReader(embeddedPackZip), int64(len(embeddedPackZip)))
+	if err != nil {
+		return nil, err
+	}
+	return reader, nil
 }

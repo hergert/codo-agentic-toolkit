@@ -101,7 +101,12 @@ func Resolve(tag string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	expected := strings.TrimSpace(string(expectedBytes))
+	expectedLine := strings.TrimSpace(string(expectedBytes))
+	fields := strings.Fields(expectedLine)
+	if len(fields) == 0 {
+		return "", fmt.Errorf("empty checksum file: %s", checksumPath)
+	}
+	expected := fields[0]
 
 	// Calculate actual checksum
 	actual, err := fileChecksum(zipPath)

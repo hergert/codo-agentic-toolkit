@@ -23,29 +23,70 @@ arch() {
 
 OS="$(os)"
 ARCH="$(arch)"
-ASSET="codo_${OS}_${ARCH}.tar.gz"
 CHECKSUMS="checksums.txt"
+VERSION="${CODO_VERSION:-latest}"
 
 mkdir -p "$BIN_DIR"
-TMP="$(mktemp -d)"
-trap 'rm -rf "$TMP"' EXIT
-cd "$TMP"
 
-BASE="https://github.com/${OWNER}/${REPO}/releases/latest/download"
-curl -fsSLO "$BASE/$ASSET"
-curl -fsSLO "$BASE/$CHECKSUMS"
+install_from_release() {
+  local tmp base asset
+  tmp="$(mktemp -d)"
+  if [ "$VERSION" = "latest" ]; then
+    base="https://github.com/${OWNER}/${REPO}/releases/latest/download"
+  else
+    base="https://github.com/${OWNER}/${REPO}/releases/download/${VERSION}"
+  fi
+  (
+    set -euo pipefail
+    trap 'rm -rf "$tmp"' EXIT
+    cd "$tmp"
+    curl -fsSLO "$base/$CHECKSUMS"
+    pattern="codo_[^[:space:]]*_${OS}_${ARCH}\.tar\.gz"
+    asset="$(grep -Eo "$pattern" "$CHECKSUMS" | head -n1 || true)"
+    if [ -z "$asset" ]; then
+      echo "Release asset for ${OS}/${ARCH} not found in $CHECKSUMS"
+      exit 1
+    fi
+    curl -fsSLO "$base/$asset"
+    if command -v shasum >/dev/null 2>&1; then
+      grep "  $asset" "$CHECKSUMS" | shasum -a 256 -c -
+    elif command -v sha256sum >/dev/null 2>&1; then
+      grep "  $asset" "$CHECKSUMS" | sha256sum -c -
+    else
+      echo "(!) sha256 tool not found; skipping checksum verification"
+    fi
+    tar -xzf "$asset" codo
+    install -m 0755 codo "$BIN_DIR/codo"
+  )
+}
 
-if command -v shasum >/dev/null 2>&1; then
-  grep "  $ASSET" "$CHECKSUMS" | shasum -a 256 -c -
-elif command -v sha256sum >/dev/null 2>&1; then
-  grep "  $ASSET" "$CHECKSUMS" | sha256sum -c -
+install_from_source() {
+  command -v go >/dev/null 2>&1 || {
+    echo "Go toolchain not found; cannot build from source" >&2
+    return 1
+  }
+
+  local tmp tarball
+  tmp="$(mktemp -d)"
+  tarball="https://github.com/${OWNER}/${REPO}/archive/refs/heads/main.tar.gz"
+  (
+    set -euo pipefail
+    trap 'rm -rf "$tmp"' EXIT
+    cd "$tmp"
+    curl -fsSL "$tarball" | tar -xz --strip-components=1
+    cd cli
+    go build -o "$BIN_DIR/codo" .
+  )
+}
+
+if install_from_release; then
+  echo "✅ codo installed to $BIN_DIR/codo"
 else
-  echo "(!) sha256 tool not found; skipping checksum verification"
+  echo "Falling back to source build..."
+  install_from_source
+  echo "✅ codo built from source at $BIN_DIR/codo"
 fi
 
-tar -xzf "$ASSET" codo
-install -m 0755 codo "$BIN_DIR/codo"
-echo "✅ codo installed to $BIN_DIR/codo"
 "$BIN_DIR/codo" version || true
 if ! command -v codo >/dev/null 2>&1; then
   echo ""
