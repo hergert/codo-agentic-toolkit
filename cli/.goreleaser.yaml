@@ -8,7 +8,7 @@ before:
 
 builds:
   - id: codo
-    main: ./main.go
+    main: .
     env:
       - CGO_ENABLED=0
     flags:
@@ -32,4 +32,3 @@ release:
     name: codo-agentic-toolkit
   draft: false
   prerelease: false
-
