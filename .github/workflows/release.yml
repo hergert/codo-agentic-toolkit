@@ -47,22 +47,20 @@ jobs:
             # Use provided tag
             NEW_TAG="${{ inputs.tag }}"
           else
-            # Auto-increment patch version
+            # Auto-increment minor version
             LATEST_TAG=$(git tag -l "v*" --sort=-version:refname | head -n1)
             if [ -z "$LATEST_TAG" ]; then
-              LATEST_TAG="v1.0.0"
+              NEW_TAG="v1.0.0"
+              echo "Latest tag: (none found, defaulting to $NEW_TAG)"
+            else
+              echo "Latest tag: $LATEST_TAG"
+              VERSION=${LATEST_TAG#v}
+              MAJOR=$(echo $VERSION | cut -d. -f1)
+              MINOR=$(echo $VERSION | cut -d. -f2)
+              # Increment minor, reset patch
+              MINOR=$((MINOR + 1))
+              NEW_TAG="v${MAJOR}.${MINOR}.0"
             fi
-            echo "Latest tag: $LATEST_TAG"
-
-            # Extract version numbers (strip 'v' prefix)
-            VERSION=${LATEST_TAG#v}
-            MAJOR=$(echo $VERSION | cut -d. -f1)
-            MINOR=$(echo $VERSION | cut -d. -f2)
-            PATCH=$(echo $VERSION | cut -d. -f3)
-
-            # Increment patch
-            PATCH=$((PATCH + 1))
-            NEW_TAG="v${MAJOR}.${MINOR}.${PATCH}"
           fi
 
           echo "New tag: $NEW_TAG"
