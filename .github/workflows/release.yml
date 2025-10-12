@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Semver tag to release (e.g., v1.0.0 for major). Leave blank to auto-increment patch version."
+        description: "Semver tag to release (e.g., v1.8.0). Leave blank to auto-bump MINOR."
         required: false
   push:
     tags:
@@ -19,9 +19,49 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  release:
+  create_tag:
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (full history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
+      - name: Determine next version (MINOR bump unless overridden)
+        id: ver
+        run: |
+          set -euo pipefail
+          git config user.name "codo-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+          if [ -n "${{ inputs.tag }}" ]; then
+            NEW_TAG="${{ inputs.tag }}"
+          else
+            LATEST_TAG="$(git tag -l 'v*' --sort=-version:refname | head -n1 || true)"
+            if [ -z "$LATEST_TAG" ]; then
+              NEW_TAG="v1.0.0"
+            else
+              VERSION="${LATEST_TAG#v}"
+              MAJOR="$(echo "$VERSION" | cut -d. -f1)"
+              MINOR="$(echo "$VERSION" | cut -d. -f2)"
+              MINOR=$((MINOR + 1))
+              NEW_TAG="v${MAJOR}.${MINOR}.0"
+            fi
+          fi
+
+          echo "tag=$NEW_TAG" >> $GITHUB_OUTPUT
+          echo "New tag: $NEW_TAG"
+
+          git tag -a "$NEW_TAG" -m "Release $NEW_TAG"
+          git push origin "$NEW_TAG"
+
+      - name: Stop (release will run on tag push)
+        run: echo "Tag pushed. Separate run will publish artifacts." && exit 0
+
+  release:
+    if: ${{ startsWith(github.ref, 'refs/tags/') }}
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout (full history for changelog)
         uses: actions/checkout@v4
@@ -36,46 +76,12 @@ jobs:
           cache: true
           cache-dependency-path: cli/go.sum
 
-      - name: Determine next version
-        if: ${{ github.event_name == 'workflow_dispatch' }}
-        id: version
-        run: |
-          git config user.name "codo-bot"
-          git config user.email "actions@users.noreply.github.com"
-
-          if [ -n "${{ inputs.tag }}" ]; then
-            # Use provided tag
-            NEW_TAG="${{ inputs.tag }}"
-          else
-            # Auto-increment minor version
-            LATEST_TAG=$(git tag -l "v*" --sort=-version:refname | head -n1)
-            if [ -z "$LATEST_TAG" ]; then
-              NEW_TAG="v1.0.0"
-              echo "Latest tag: (none found, defaulting to $NEW_TAG)"
-            else
-              echo "Latest tag: $LATEST_TAG"
-              VERSION=${LATEST_TAG#v}
-              MAJOR=$(echo $VERSION | cut -d. -f1)
-              MINOR=$(echo $VERSION | cut -d. -f2)
-              # Increment minor, reset patch
-              MINOR=$((MINOR + 1))
-              NEW_TAG="v${MAJOR}.${MINOR}.0"
-            fi
-          fi
-
-          echo "New tag: $NEW_TAG"
-          echo "tag=$NEW_TAG" >> $GITHUB_OUTPUT
-
-          # Create and push tag
-          git tag -a "$NEW_TAG" -m "Release $NEW_TAG"
-          git push origin "$NEW_TAG"
-
       - name: Prepare embedded pack & smoke build
         run: |
           ./scripts/embed-pack.sh
           go -C cli build -o /tmp/codo .
 
-      - name: Run GoReleaser
+      - name: Run GoReleaser (tagged release)
         uses: goreleaser/goreleaser-action@v6
         with:
           version: '~> v1'
@@ -88,19 +94,18 @@ jobs:
         run: |
           set -euo pipefail
           cd "$GITHUB_WORKSPACE"
-          if [ ! -d pack ]; then
-            echo "pack not found; skipping pack asset" >&2
-            exit 0
+          if [ -d pack ]; then
+            zip -r "dotclaude-pack.zip" pack
+            shasum -a 256 "dotclaude-pack.zip" > "dotclaude-pack.sha256"
           fi
-          zip -r "dotclaude-pack.zip" pack
-          shasum -a 256 "dotclaude-pack.zip" > "dotclaude-pack.sha256"
 
       - name: Upload pack asset to release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.version.outputs.tag || github.ref_name }}
+          tag_name: ${{ github.ref_name }}
           files: |
             dotclaude-pack.zip
             dotclaude-pack.sha256
+          fail_on_unmatched_files: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -42,7 +42,7 @@ jobs:
       - name: GoReleaser snapshot (no publish)
         uses: goreleaser/goreleaser-action@v6
         with:
-          version: latest
+          version: '~> v1'
           args: release --clean --snapshot --skip=publish
           workdir: ./cli
         env:
@@ -56,7 +56,10 @@ jobs:
             cli/dist/**/*
           if-no-files-found: ignore
 
-      - name: Package pack for latest release
+      - name: Refresh embedded pack
+        run: ./scripts/embed-pack.sh
+
+      - name: Package pack for dev build
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: |
           set -euo pipefail
@@ -66,15 +69,15 @@ jobs:
             shasum -a 256 "dotclaude-pack.zip" > "dotclaude-pack.sha256"
           fi
 
-      - name: Update latest release
+      - name: Publish edge (dev) build
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: latest
-          name: Latest Build
+          tag_name: edge
+          name: Edge build
           prerelease: true
           body: |
-            Latest build from main branch
+            Nightly dev build from main
             - Commit: ${{ github.sha }}
             - Date: ${{ github.event.head_commit.timestamp }}
           files: |
@@ -82,6 +85,6 @@ jobs:
             cli/dist/checksums.txt
             dotclaude-pack.zip
             dotclaude-pack.sha256
+          fail_on_unmatched_files: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-

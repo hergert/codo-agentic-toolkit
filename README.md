@@ -7,7 +7,15 @@ Install the Codo CLI and manage the **dotclaude** pack in any repo.
 ```bash
 curl -fsSL https://raw.githubusercontent.com/hergert/codo-agentic-toolkit/main/scripts/install.sh | bash
 ```
-This downloads the latest release from GitHub, verifies SHA256 checksums, and installs `codo` to `~/.local/bin`.
+This downloads the latest tagged release from GitHub, verifies SHA256 checksums, and installs `codo` to `~/.local/bin`.
+
+Need the latest dev build from `main` instead? Point the installer at the `edge` prerelease:
+
+```bash
+CODO_VERSION=edge \
+  curl -fsSL https://raw.githubusercontent.com/hergert/codo-agentic-toolkit/main/scripts/install.sh | bash
+```
+The `edge` channel is rebuilt on every push to `main`.
 
 ### Shell completion
 ```bash
