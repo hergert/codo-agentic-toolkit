@@ -34,7 +34,7 @@ codo init --stacks "cloudflare-workers,go"
 # update (safe: only overwrites clean files; diverged files → *.codo.new)
 codo update
 
-# uninstall (backs up to .codo-backup/<timestamp>/)
+# uninstall (backs up outside the repo; path printed after removal)
 codo remove
 
 # self-update the CLI

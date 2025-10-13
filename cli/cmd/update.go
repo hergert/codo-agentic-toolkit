@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/hergert/codo-agentic-toolkit/cli/internal/fsops"
 	"github.com/hergert/codo-agentic-toolkit/cli/internal/manifest"
 	"github.com/hergert/codo-agentic-toolkit/cli/internal/pack"
 	"github.com/spf13/cobra"
@@ -73,13 +72,14 @@ var updateCmd = &cobra.Command{
 			}
 		}
 
-		// Ensure report dir exists
-		_ = os.MkdirAll(filepath.Join(".claude", ".codo-report"), 0o755)
-
-		// Track which files exist in the old manifest for removal detection
+		// Track which files exist in the old manifest and unmanaged entries
 		oldSet := map[string]manifest.Entry{}
+		unmanaged := map[string]bool{}
 		for _, ent := range m.Files {
 			oldSet[ent.Path] = ent
+			if ent.Unmanaged {
+				unmanaged[ent.Path] = true
+			}
 		}
 
 		// Process each file from the old manifest
@@ -88,6 +88,14 @@ var updateCmd = &cobra.Command{
 			nb, ok := newMap[dst]
 			if !ok {
 				// File removed upstream - handle safely
+				if ent.Unmanaged {
+					fmt.Println("~ skip unmanaged " + dst)
+					if !updateDry {
+						_ = os.Remove(dst + ".codo.new")
+					}
+					delete(unmanaged, dst)
+					continue
+				}
 				cur, err := os.ReadFile(dst)
 				if err != nil {
 					// File already gone, nothing to do
@@ -107,7 +115,6 @@ var updateCmd = &cobra.Command{
 					note := dst + ".codo.removed.suggested"
 					fmt.Println("! modified & removed upstream → " + note)
 					if !updateDry {
-						fsops.AppendReportHook(note)
 						msg := []byte("Upstream removed this file, but you have local changes.\nConsider removing it manually if no longer needed.\n")
 						if err := os.WriteFile(note, msg, 0o644); err != nil {
 							return err
@@ -123,13 +130,34 @@ var updateCmd = &cobra.Command{
 				// Missing → treat as clean overwrite
 				fmt.Println("+ " + dst)
 				if !updateDry {
+					if err := os.MkdirAll(filepath.Dir(dst), 0o755); err != nil {
+						return err
+					}
 					if err := os.WriteFile(dst, nb, 0o644); err != nil {
 						return err
 					}
 				}
+				delete(unmanaged, dst)
 				continue
 			}
 			curHash := fmt.Sprintf("%x", sha256.Sum256(cur))
+			newHash := fmt.Sprintf("%x", sha256.Sum256(nb))
+			if ent.Unmanaged {
+				if curHash == newHash {
+					fmt.Println("= " + dst)
+					delete(unmanaged, dst)
+				} else {
+					out := dst + ".codo.new"
+					fmt.Println("! conflict → " + out)
+					if !updateDry {
+						if err := os.WriteFile(out, nb, 0o644); err != nil {
+							return err
+						}
+					}
+					unmanaged[dst] = true
+				}
+				continue
+			}
 			if curHash == ent.SHA256 {
 				// clean → overwrite
 				fmt.Println("~ " + dst)
@@ -138,16 +166,17 @@ var updateCmd = &cobra.Command{
 						return err
 					}
 				}
+				delete(unmanaged, dst)
 			} else {
 				// diverged → write .codo.new
 				out := dst + ".codo.new"
 				fmt.Println("! conflict → " + out)
 				if !updateDry {
-					fsops.AppendReportHook(out)
 					if err := os.WriteFile(out, nb, 0o644); err != nil {
 						return err
 					}
 				}
+				delete(unmanaged, dst)
 			}
 		}
 
@@ -164,11 +193,12 @@ var updateCmd = &cobra.Command{
 						return err
 					}
 				}
+				delete(unmanaged, path)
 			}
 		}
 		if !updateDry {
 			newVersion := packSource
-			if err := manifest.WriteWithStacks(files, newVersion, m.Stacks); err != nil {
+			if err := manifest.WriteWithStacks(files, newVersion, m.Stacks, unmanaged); err != nil {
 				return err
 			}
 		}

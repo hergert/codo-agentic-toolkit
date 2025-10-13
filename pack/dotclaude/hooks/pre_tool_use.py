@@ -35,6 +35,28 @@ if tool == "Read":
         print(json.dumps(out))
         sys.exit(0)
 
+    # ask on huge or minified assets
+    try:
+        if path and os.path.exists(path):
+            size = os.path.getsize(path)
+            if size > 300_000:  # ~300 KB
+                print(json.dumps({"hookSpecificOutput": {
+                    "hookEventName": "PreToolUse",
+                    "permissionDecision": "ask",
+                    "permissionDecisionReason": f"Large file ({size//1024}KB). Summarize or open smaller slice?"
+                }}))
+                sys.exit(0)
+        base_lower = os.path.basename(path).lower()
+        if base_lower.endswith((".min.js", ".min.css", ".map", ".bundle.js", ".lock", "package-lock.json", "pnpm-lock.yaml", "yarn.lock")):
+            print(json.dumps({"hookSpecificOutput": {
+                "hookEventName": "PreToolUse",
+                "permissionDecision": "ask",
+                "permissionDecisionReason": f"Likely generated/minified asset: {base_lower}. Proceed?"
+            }}))
+            sys.exit(0)
+    except Exception:
+        pass
+
 # Allow docs/.claude edits always
 if tool in ("Edit","Write","MultiEdit") and (path.startswith("docs/") or path.startswith(".claude/")):
     sys.exit(0)

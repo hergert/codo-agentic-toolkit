@@ -23,42 +23,47 @@ func sha256File(path string) (string, error) {
 	return fmt.Sprintf("%x", h.Sum(nil)), nil
 }
 
-func CopySafe(f pack.File, projectRoot string, dry bool) error {
+func CopySafe(f pack.File, projectRoot string, dry bool) (bool, error) {
 	dst := filepath.Join(projectRoot, f.RelPath)
 	if !dry {
 		if err := os.MkdirAll(filepath.Dir(dst), 0o755); err != nil {
-			return err
+			return false, err
 		}
 	}
 	srcBytes, err := f.Read()
 	if err != nil {
-		return err
+		return false, err
 	}
 
 	if _, err := os.Stat(dst); err == nil {
 		tmp := dst + ".codo.new"
 		curHash, err := sha256File(dst)
 		if err != nil {
-			return fmt.Errorf("hash current file %s: %w", dst, err)
+			return false, fmt.Errorf("hash current file %s: %w", dst, err)
 		}
 		newHash := fmt.Sprintf("%x", sha256.Sum256(srcBytes))
 		if curHash == newHash {
 			fmt.Println("= " + f.RelPath)
-			return nil
+			return true, nil
 		}
 		fmt.Println("! conflict → " + tmp)
 		if dry {
-			return nil
+			return false, nil
 		}
-		appendReport("conflicts.txt", tmp)
-		return os.WriteFile(tmp, srcBytes, 0o644)
+		if err := os.WriteFile(tmp, srcBytes, 0o644); err != nil {
+			return false, err
+		}
+		return false, nil
 	}
 
 	fmt.Println("+ " + f.RelPath)
 	if dry {
-		return nil
+		return true, nil
 	}
-	return os.WriteFile(dst, srcBytes, 0o644)
+	if err := os.WriteFile(dst, srcBytes, 0o644); err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 func ChmodHooks() error {

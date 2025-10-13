@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -101,13 +100,15 @@ var initCmd = &cobra.Command{
 			return err
 		}
 
-		reportDir := filepath.Join(".claude", ".codo-report")
-		_ = os.MkdirAll(reportDir, 0o755)
-
+		unmanaged := map[string]bool{}
 		// Copy safely (or simulate with --dry-run). fsops prints +/=!/conflict lines.
 		for _, f := range files {
-			if err := fsops.CopySafe(f, root, initDryRun); err != nil {
+			managed, err := fsops.CopySafe(f, root, initDryRun)
+			if err != nil {
 				return err
+			}
+			if !managed {
+				unmanaged[f.RelPath] = true
 			}
 		}
 		installedVersion := packSource
@@ -115,11 +116,11 @@ var initCmd = &cobra.Command{
 			if err := fsops.ChmodHooks(); err != nil {
 				return err
 			}
-			if err := manifest.WriteWithStacks(files, installedVersion, choices.Stacks); err != nil {
+			if err := manifest.WriteWithStacks(files, installedVersion, choices.Stacks, unmanaged); err != nil {
 				return err
 			}
 		}
-		fmt.Printf("\nCodo %s initialized. See .claude/.codo-report/conflicts.txt if any.\n", installedVersion)
+		fmt.Printf("\nCodo %s initialized. Resolve any *.codo.new conflicts noted above.\n", installedVersion)
 		return nil
 	},
 }

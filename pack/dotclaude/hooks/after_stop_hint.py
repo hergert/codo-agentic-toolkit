@@ -40,10 +40,10 @@ def hint_for(text: str):
         return None
     first = t.splitlines()[0].strip()
     if first.startswith("/prime"):
-        return 'Next: /scope "<key>" to map & plan, or /build "<key>" if a plan exists.'
-    if first.startswith("/scope"):
-        return 'Next: /build "<key>" — tests first, smallest viable diff.'
-    if first.startswith("/build"):
+        return 'Next: /plan "<key>" to map & plan, or /execute "<key>" if a plan exists.'
+    if first.startswith("/plan"):
+        return 'Next: /execute "<key>" — tests first, smallest viable diff.'
+    if first.startswith("/execute"):
         return 'Next: /review "<key>" — aim APPROVE; then /prepare-commit.'
     if first.startswith("/review"):
         return 'Next: /prepare-commit — human reviews & commits.'
