@@ -37,8 +37,8 @@ codo update
 # uninstall (backs up outside the repo; path printed after removal)
 codo remove
 
-# self-update the CLI
-codo self-update
+# upgrade the CLI
+codo upgrade
 
 # status & doctor
 codo status

@@ -6,6 +6,8 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/blang/semver"
+	"github.com/rhysd/go-github-selfupdate/selfupdate"
 	"github.com/spf13/cobra"
 )
 
@@ -41,6 +43,10 @@ var doctorCmd = &cobra.Command{
 				fmt.Println("✗ exec", h)
 			}
 		}
+
+		if err := emitUpgradeStatus(); err != nil {
+			fmt.Println("✗ upgrade check:", err)
+		}
 		return nil
 	},
 }
@@ -66,4 +72,34 @@ func checkPython() error {
 		}
 	}
 	return fmt.Errorf("Python 3 not found (required for hooks)")
+}
+
+func emitUpgradeStatus() error {
+	if version == "dev" {
+		fmt.Println("✓ upgrade check: development build (skipping release detection)")
+		return nil
+	}
+
+	v, err := semver.Parse(strings.TrimPrefix(version, "v"))
+	if err != nil {
+		return fmt.Errorf("parse current version %q: %w", version, err)
+	}
+
+	latest, found, err := selfupdate.DetectLatest(releaseRepo)
+	if err != nil {
+		return err
+	}
+	if !found {
+		fmt.Println("✓ upgrade check: no published releases found")
+		return nil
+	}
+
+	if !latest.Version.GT(v) {
+		fmt.Printf("✓ upgrade check: running latest (v%s)\n", v)
+		return nil
+	}
+
+	fmt.Printf("✗ upgrade available: v%s (current v%s)\n", latest.Version, v)
+	fmt.Println("  run `codo upgrade` to install")
+	return nil
 }

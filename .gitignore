@@ -54,3 +54,4 @@ trees/
 # Release artifacts (local builds)
 dotclaude-pack-*.zip
 dotclaude-pack-*.sha256
+.gocache

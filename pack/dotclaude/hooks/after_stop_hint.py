@@ -64,6 +64,25 @@ def main():
     if not msg:
         sys.exit(0)
 
+    try:
+        import subprocess
+
+        out = subprocess.check_output(
+            ["bash", "-lc", "git diff --name-only | wc -l"], text=True
+        ).strip()
+        n = int(out or "0")
+        if n > 8 and msg.startswith("Next: /execute"):
+            print(
+                json.dumps(
+                    {
+                        "systemMessage": "This is a large diff; consider `reader <key>` (scout) before /execute, or `reviewer <key>` as a final audit."
+                    }
+                )
+            )
+            sys.exit(0)
+    except Exception:
+        pass
+
     out = {"systemMessage": msg}
     print(json.dumps(out))
     sys.exit(0)

@@ -21,6 +21,10 @@ Project Tag: CODO-ANCHOR
 
 Think → Plan (pseudo‑code) → **Show & confirm** → Implement → Tests green → (User handles commit/PR).
 
+### Agent heuristics
+- `reader <key>` (scout) after `/plan` when unknown codepaths remain or “Files to touch” > ~8; review the brief, update the plan, then continue.
+- `reviewer <key>` (audit) after `/execute` succeeds and before `/prepare-commit` on large diffs (>8 files) or risky areas; skim the one-page output.
+
 ## Conventions
 
 - Prefer small, surgical diffs with clear rationale.

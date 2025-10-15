@@ -10,9 +10,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var selfUpdateCmd = &cobra.Command{
-	Use:   "self-update",
-	Short: "Update the codo binary to the latest release",
+const releaseRepo = "hergert/codo-agentic-toolkit"
+
+var upgradeCmd = &cobra.Command{
+	Use:     "upgrade",
+	Aliases: []string{"self-update"},
+	Short:   "Upgrade the codo binary to the latest release",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		v, err := semver.Parse(strings.TrimPrefix(version, "v"))
 		if err != nil {
@@ -24,7 +27,7 @@ var selfUpdateCmd = &cobra.Command{
 			return fmt.Errorf("get executable path: %w", err)
 		}
 
-		latest, err := selfupdate.UpdateCommand(exe, v, "hergert/codo-agentic-toolkit")
+		latest, err := selfupdate.UpdateCommand(exe, v, releaseRepo)
 		if err != nil {
 			return fmt.Errorf("update failed: %w", err)
 		}
@@ -38,4 +41,3 @@ var selfUpdateCmd = &cobra.Command{
 		return nil
 	},
 }
-
