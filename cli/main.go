@@ -6,8 +6,7 @@ import (
 )
 
 func init() {
-	// Initialize the embedded pack for internal packages
-	if fs, err := GetEmbeddedPack(); err == nil {
+	if fs, err := pack.LoadEmbeddedPack(); err == nil {
 		pack.SetEmbeddedFS(fs)
 	}
 }

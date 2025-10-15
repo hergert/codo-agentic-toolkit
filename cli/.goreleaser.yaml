@@ -5,6 +5,7 @@ project_name: codo
 before:
   hooks:
     - go mod tidy
+    - go generate ./internal/pack
 
 builds:
   - id: codo

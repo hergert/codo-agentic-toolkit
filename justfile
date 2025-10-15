@@ -10,6 +10,10 @@ default:
 build:
     cd cli && just build
 
+# Regenerate embedded pack bytes
+ensure-pack:
+    cd cli && just ensure-pack
+
 # Install codo to ~/.local/bin
 install:
     cd cli && just install
