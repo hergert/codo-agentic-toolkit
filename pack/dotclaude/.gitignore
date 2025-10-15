@@ -1,0 +1,6 @@
+# Codo session artifacts
+.claude/session/
+.claude/.codo-report/
+.claude/.session-commit-message.txt
+*.codo.new
+*.codo.removed.suggested

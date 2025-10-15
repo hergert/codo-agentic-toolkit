@@ -1,7 +1,8 @@
+---
 name: reader
 description: >
-Scout unknown areas without polluting the main thread. Map contracts & data flows,
-then stop. Never edit code.
+  Scout unknown areas without polluting the main thread. Map contracts & data flows,
+  then stop. Never edit code.
 tools: [Read, Bash]
 model: sonnet
 deliverable: docs/results/{{key}}.reader.md
@@ -19,7 +20,7 @@ deliverable: docs/results/{{key}}.reader.md
 - Data flows (DB, queues, external APIs) as 1-2 diagrams (ASCII ok)
 - Existing tests covering these paths (links only)
 - 5-7 acceptance checks candidates (contract-level)
-- “Files to touch” draft (≤8), sorted by impact
+  - “Files to touch” draft (≤8), sorted by impact
 - Open questions (TODO(human)), each ≤1 line
 
 # Don’t:

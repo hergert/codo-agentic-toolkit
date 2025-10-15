@@ -1,23 +1,56 @@
 {
   "includeCoAuthoredBy": false,
-  "defaultMode": "plan",
-  "additionalDirectories": ["docs", ".claude", "scripts", ".github"],
-  "rules": [
-    { "tool": "Edit|Write|MultiEdit", "scope": "docs/**|.claude/**", "policy": "allow" },
-
-    { "tool": "Edit|Write|MultiEdit", "scope": "**/*.go|**/*.ts|**/*.tsx|**/*.py|**/*.js|**/*.jsx|src/**|internal/**|cmd/**|pkg/**", "policy": "ask" },
-    { "tool": "Edit|Write|MultiEdit", "scope": "**/.env|**/.git/**|**/package-lock.json|**/pnpm-lock.yaml|**/yarn.lock|**/node_modules/**|**/deploy/**", "policy": "deny" },
-
-    { "tool": "Bash(go test ./...)|Bash(go test -run*)|Bash(git status*)|Bash(git diff*)|Bash(git grep*)|Bash(find *)", "policy": "allow" },
-    { "tool": "Bash(pnpm test*)|Bash(npm test*)|Bash(yarn test*)|Bash(bun test*)|Bash(vitest*)", "policy": "allow" },
-    { "tool": "Bash(uv run pytest*)|Bash(pytest*)", "policy": "allow" },
-    { "tool": "Bash(mvn test*)|Bash(gradle test*)", "policy": "allow" },
-    { "tool": "Bash(flutter test*)", "policy": "allow" },
-
-    { "tool": "Bash(git commit:*)|Bash(gh pr create:*)|Bash(gh pr merge:*)|Bash(git tag:*)", "policy": "deny" },
-
-    { "tool": "Bash(curl:*)|Bash(wget:*)", "policy": "deny" },
-    { "tool": "WebFetch|WebSearch", "policy": "ask" }
-  ],
-  "notes": "…"
+  "permissions": {
+    "defaultMode": "plan",
+    "additionalDirectories": ["docs", ".claude", "scripts", ".github"],
+    "allow": [
+      "Read(**)",
+      "Edit(/docs/**)",
+      "Edit(/.claude/**)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git grep:*)",
+      "Bash(find:*)",
+      "Bash(go test ./...:*)",
+      "Bash(go test -run:*)",
+      "Bash(pnpm test:*)",
+      "Bash(npm test:*)",
+      "Bash(yarn test:*)",
+      "Bash(bun test:*)",
+      "Bash(vitest:*)",
+      "Bash(uv run pytest:*)",
+      "Bash(pytest:*)",
+      "Bash(mvn test:*)",
+      "Bash(gradle test:*)",
+      "Bash(flutter test:*)"
+    ],
+    "ask": [
+      "Edit(/src/**)",
+      "Edit(/internal/**)",
+      "Edit(/cmd/**)",
+      "Edit(/pkg/**)",
+      "Bash(npx wrangler deploy:*)",
+      "Bash(wrangler deploy:*)",
+      "WebFetch",
+      "WebSearch"
+    ],
+    "deny": [
+      "Edit(/**/.env)",
+      "Edit(/**/.git/**)",
+      "Edit(/**/package-lock.json)",
+      "Edit(/**/pnpm-lock.yaml)",
+      "Edit(/**/yarn.lock)",
+      "Edit(/**/node_modules/**)",
+      "Edit(/**/deploy/**)",
+      "Bash(git commit:*)",
+      "Bash(git tag:*)",
+      "Bash(git push:*)",
+      "Bash(git push --force:*)",
+      "Bash(git push --tags:*)",
+      "Bash(gh pr create:*)",
+      "Bash(gh pr merge:*)",
+      "Bash(curl:*)",
+      "Bash(wget:*)"
+    ]
+  }
 }

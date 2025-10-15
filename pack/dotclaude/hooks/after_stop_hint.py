@@ -16,22 +16,64 @@ def read_last_user_text(transcript_path: str) -> str:
                     ev = json.loads(line)
                 except Exception:
                     continue
-                role = (ev.get("message") or {}).get("role")
-                content = (ev.get("message") or {}).get("content")
-                if role == "user":
-                    # content can be str or array-of-blocks
-                    if isinstance(content, str):
-                        last_text = content
-                    elif isinstance(content, list):
-                        pieces = []
-                        for b in content:
-                            if isinstance(b, dict) and b.get("type") == "text":
-                                pieces.append(b.get("text", ""))
-                        if pieces:
-                            last_text = "\n".join(pieces)
+                for msg in _candidate_messages(ev):
+                    if msg.get("role") != "user":
+                        continue
+                    text = _coerce_text(msg.get("content"))
+                    if text:
+                        last_text = text
     except Exception:
         pass
     return last_text.strip()
+
+
+def _candidate_messages(ev):
+    """Yield message-like dicts regardless of event shape."""
+    if not isinstance(ev, dict):
+        return []
+    candidates = []
+    msg = ev.get("message")
+    if isinstance(msg, dict):
+        candidates.append(msg)
+    if isinstance(ev.get("messages"), list):
+        candidates.extend(m for m in ev["messages"] if isinstance(m, dict))
+    if isinstance(ev.get("data"), dict):
+        data = ev["data"]
+        if isinstance(data.get("message"), dict):
+            candidates.append(data["message"])
+        if isinstance(data.get("messages"), list):
+            candidates.extend(m for m in data["messages"] if isinstance(m, dict))
+    top = {k: ev.get(k) for k in ("role", "content") if k in ev}
+    if top and "role" in top:
+        candidates.append(top)
+    return candidates
+
+
+def _coerce_text(content):
+    if isinstance(content, str):
+        return content
+    if isinstance(content, dict):
+        text = content.get("text") or content.get("content")
+        if isinstance(text, str):
+            return text
+        if isinstance(text, list):
+            return _coerce_text(text)
+        if content.get("type") == "text" and isinstance(content.get("text"), str):
+            return content.get("text")
+    if isinstance(content, list):
+        pieces = []
+        for item in content:
+            if isinstance(item, dict):
+                if item.get("type") == "text" and isinstance(item.get("text"), str):
+                    pieces.append(item.get("text", ""))
+                elif "text" in item and isinstance(item["text"], str):
+                    pieces.append(item["text"])
+                elif "content" in item and isinstance(item["content"], str):
+                    pieces.append(item["content"])
+            elif isinstance(item, str):
+                pieces.append(item)
+        return "\n".join(pieces).strip()
+    return ""
 
 
 def hint_for(text: str):

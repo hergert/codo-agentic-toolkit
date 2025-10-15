@@ -1,3 +1,4 @@
+---
 name: reviewer
 description: Final audit against acceptance checks; no edits. Output one page and stop.
 tools: [Read, Bash]

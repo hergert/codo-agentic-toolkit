@@ -91,5 +91,9 @@ fi
 if ! command -v codo >/dev/null 2>&1; then
   echo ""
   echo "Add to PATH (bash/zsh):"
-  echo "  export PATH=\"\$PATH:$BIN_DIR\""
+  if [ "$BIN_DIR" = "$HOME/.local/bin" ]; then
+    echo "  export PATH=\"\$PATH:~/.local/bin\""
+  else
+    echo "  export PATH=\"\$PATH:$BIN_DIR\""
+  fi
 fi

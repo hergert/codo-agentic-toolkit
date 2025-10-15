@@ -41,8 +41,10 @@ coverage*.out
 # Codo toolkit artifacts
 .codo-backup/
 *.codo.new
+*.codo.removed.suggested
 .claude/.codo-manifest.json
 .claude/.codo-report/
+.claude/.session-commit-message.txt
 .claude/session/
 
 # Local Claude settings (do not commit)

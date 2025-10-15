@@ -25,12 +25,17 @@ func headOK(u string) bool {
 	}
 	r, err := httpClient.Do(req)
 	if err != nil {
-		gr, gerr := httpClient.Get(u)
+		gr, gerr := http.NewRequest(http.MethodGet, u, nil)
 		if gerr != nil {
 			return false
 		}
-		gr.Body.Close()
-		return gr.StatusCode == http.StatusOK
+		gr.Header.Set("Range", "bytes=0-0")
+		resp, gerr := httpClient.Do(gr)
+		if gerr != nil {
+			return false
+		}
+		resp.Body.Close()
+		return resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusPartialContent
 	}
 	r.Body.Close()
 	return r.StatusCode == http.StatusOK
