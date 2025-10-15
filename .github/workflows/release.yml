@@ -88,11 +88,10 @@ jobs:
       - name: Package dotclaude pack asset
         run: |
           set -euo pipefail
+          cd "$GITHUB_WORKSPACE/pack"
+          zip -r ../dotclaude-pack.zip .
           cd "$GITHUB_WORKSPACE"
-          if [ -d pack ]; then
-            zip -r "dotclaude-pack.zip" pack
-            shasum -a 256 "dotclaude-pack.zip" > "dotclaude-pack.sha256"
-          fi
+          shasum -a 256 dotclaude-pack.zip > dotclaude-pack.sha256
 
       - name: Upload pack asset to release
         uses: softprops/action-gh-release@v2

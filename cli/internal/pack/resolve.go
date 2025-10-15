@@ -129,7 +129,33 @@ func Resolve(tag string) (string, error) {
 		return "", fmt.Errorf("failed to extract pack: %w", err)
 	}
 
-	return extractDir, nil
+	normalized, err := canonicalPackRoot(extractDir)
+	if err != nil {
+		return "", err
+	}
+
+	return normalized, nil
+}
+
+func canonicalPackRoot(root string) (string, error) {
+	candidates := []string{root}
+	files, err := os.ReadDir(root)
+	if err == nil {
+		for _, entry := range files {
+			if entry.IsDir() && strings.EqualFold(entry.Name(), "pack") {
+				candidates = append([]string{filepath.Join(root, entry.Name())}, candidates...)
+				break
+			}
+		}
+	}
+
+	for _, dir := range candidates {
+		if _, err := os.Stat(filepath.Join(dir, "dotclaude")); err == nil {
+			return dir, nil
+		}
+	}
+
+	return "", fmt.Errorf("dotclaude directory not found in pack (checked %v)", candidates)
 }
 
 func downloadFile(filepath string, url string) error {
