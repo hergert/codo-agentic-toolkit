@@ -13,7 +13,6 @@ on:
 permissions:
   contents: write
   pull-requests: write
-  workflow: write
 
 concurrency:
   group: release-${{ github.ref }}
@@ -23,6 +22,10 @@ jobs:
   create_tag:
     if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      workflow: write
     steps:
       - name: Checkout (full history)
         uses: actions/checkout@v4
