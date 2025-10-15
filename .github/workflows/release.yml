@@ -6,68 +6,62 @@ on:
       tag:
         description: "Semver tag to release (e.g., v1.8.0). Leave blank to auto-bump MINOR."
         required: false
-  push:
-    tags:
-      - "v*"
 
 permissions:
   contents: write
   pull-requests: write
-  workflows: write
 
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  create_tag:
-    if: ${{ github.event_name == 'workflow_dispatch' }}
+  release:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout (full history)
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Determine next version (MINOR bump unless overridden)
-        id: ver
+      - name: Determine release tag
+        id: prep
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_TAG: ${{ inputs.tag }}
+          REF_NAME: ${{ github.ref_name }}
         run: |
           set -euo pipefail
           git config user.name "codo-bot"
           git config user.email "actions@users.noreply.github.com"
 
-          if [ -n "${{ inputs.tag }}" ]; then
-            NEW_TAG="${{ inputs.tag }}"
-          else
-            LATEST_TAG="$(git tag -l 'v*' --sort=-version:refname | head -n1 || true)"
-            if [ -z "$LATEST_TAG" ]; then
-              NEW_TAG="v1.0.0"
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            if [ -n "$INPUT_TAG" ]; then
+              TAG_NAME="$INPUT_TAG"
             else
-              VERSION="${LATEST_TAG#v}"
-              MAJOR="$(echo "$VERSION" | cut -d. -f1)"
-              MINOR="$(echo "$VERSION" | cut -d. -f2)"
-              MINOR=$((MINOR + 1))
-              NEW_TAG="v${MAJOR}.${MINOR}.0"
+              LATEST_TAG="$(git tag -l 'v*' --sort=-version:refname | head -n1 || true)"
+              if [ -z "$LATEST_TAG" ]; then
+                TAG_NAME="v1.0.0"
+              else
+                VERSION="${LATEST_TAG#v}"
+                MAJOR="$(echo "$VERSION" | cut -d. -f1)"
+                MINOR="$(echo "$VERSION" | cut -d. -f2)"
+                MINOR=$((MINOR + 1))
+                TAG_NAME="v${MAJOR}.${MINOR}.0"
+              fi
             fi
+            git tag -a "$TAG_NAME" -m "Release $TAG_NAME"
+            git push origin "$TAG_NAME"
+          else
+            TAG_NAME="$REF_NAME"
           fi
 
-          echo "tag=$NEW_TAG" >> $GITHUB_OUTPUT
-          echo "New tag: $NEW_TAG"
+          echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
 
-          git tag -a "$NEW_TAG" -m "Release $NEW_TAG"
-          git push origin "$NEW_TAG"
-
-      - name: Stop (release will run on tag push)
-        run: echo "Tag pushed. Separate run will publish artifacts." && exit 0
-
-  release:
-    if: ${{ startsWith(github.ref, 'refs/tags/') }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout (full history for changelog)
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - name: Checkout tag
+        run: |
+          git fetch --tags --force
+          git checkout "$TAG_NAME"
 
       - name: Set up Go
         uses: actions/setup-go@v5
@@ -103,7 +97,7 @@ jobs:
       - name: Upload pack asset to release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
+          tag_name: ${{ env.TAG_NAME }}
           files: |
             dotclaude-pack.zip
             dotclaude-pack.sha256
