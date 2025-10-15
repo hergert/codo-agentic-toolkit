@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"github.com/blang/semver"
+	update "github.com/inconshreveable/go-update"
 	"github.com/rhysd/go-github-selfupdate/selfupdate"
 	"github.com/spf13/cobra"
 )
@@ -220,8 +221,8 @@ func extractBinaryFromArchive(asset string, archive []byte) ([]byte, error) {
 
 func applyUpdateBinary(exe string, binary []byte) error {
 	reader := bytes.NewReader(binary)
-	if err := selfupdate.Apply(reader, selfupdate.Options{TargetPath: exe}); err != nil {
-		if rerr := selfupdate.RollbackError(err); rerr != nil {
+	if err := update.Apply(reader, update.Options{TargetPath: exe}); err != nil {
+		if rerr := update.RollbackError(err); rerr != nil {
 			return fmt.Errorf("apply update: %w (rollback failed: %v)", err, rerr)
 		}
 		return fmt.Errorf("apply update: %w", err)
