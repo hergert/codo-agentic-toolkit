@@ -13,6 +13,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  workflows: write
 
 concurrency:
   group: release-${{ github.ref }}
@@ -28,23 +29,12 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Configure git for tag push
-        env:
-          PUSH_TOKEN: ${{ secrets.RELEASE_PUSH_TOKEN }}
-        run: |
-          set -euo pipefail
-          if [ -z "$PUSH_TOKEN" ]; then
-            echo "Secret RELEASE_PUSH_TOKEN is not configured" >&2
-            exit 1
-          fi
-          git config user.name "codo-bot"
-          git config user.email "actions@users.noreply.github.com"
-          git remote set-url origin "https://${PUSH_TOKEN}@github.com/${{ github.repository }}.git"
-
       - name: Determine next version (MINOR bump unless overridden)
         id: ver
         run: |
           set -euo pipefail
+          git config user.name "codo-bot"
+          git config user.email "actions@users.noreply.github.com"
 
           if [ -n "${{ inputs.tag }}" ]; then
             NEW_TAG="${{ inputs.tag }}"
