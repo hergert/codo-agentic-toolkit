@@ -35,7 +35,6 @@ var doctorCmd = &cobra.Command{
 			".claude/hooks/pre_tool_use.py",
 			".claude/hooks/post_tool_use.py",
 			".claude/hooks/user_prompt_submit.py",
-			".claude/hooks/experience_update.py",
 		} {
 			if fi, err := os.Stat(h); err == nil && fi.Mode()&0o111 != 0 {
 				fmt.Println("✓ exec", h)

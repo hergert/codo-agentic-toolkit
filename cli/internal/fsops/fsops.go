@@ -71,7 +71,6 @@ func ChmodHooks() error {
 		filepath.Join(".claude", "hooks", "pre_tool_use.py"),
 		filepath.Join(".claude", "hooks", "post_tool_use.py"),
 		filepath.Join(".claude", "hooks", "user_prompt_submit.py"),
-		filepath.Join(".claude", "hooks", "experience_update.py"),
 	}
 	for _, p := range files {
 		if _, err := os.Stat(p); err == nil {

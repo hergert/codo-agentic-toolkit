@@ -1,25 +1,21 @@
 ---
-description: Distill the session's learning (no writes). Run built-in /compact separately if needed.
+description: Distill the session's learning; write to ledger only if truly useful.
 argument-hint: [feature-key]
-allowed-tools: Read
+allowed-tools: Read, Edit
 ---
 
-Aim for 2-4 bullets max; each bullet ≤25 words; prefer action verbs and concrete heuristics.
+Aim for 1–3 bullets max; each bullet ≤25 words; concrete, secret-free, reusable.
 
-# Experience distiller (no writes)
-
-Summarize this session as ≤120 tokens. Then propose **0-5 bullets** worth remembering long-term, or say "nothing learned".
-Each bullet must be:
-
-- Atomic, reusable, and secret-free
-- Tagged with 3-5 tags (tech/area/component/risk)
-- Optional scope hint: paths=["pkg/x/","cmd/api/"]
-
-# Output (exact)
+# Produce a short "Experience" block:
+- If there's **nothing worth keeping**, print exactly: `Experience: nothing learned` and **do not edit any file**.
+- Otherwise print:
 
 Experience:
+- <bullet 1>  tags=[area,tech,risk]  scope=[optional/paths]
+- <bullet 2>  tags=[...]
 
-- <bullet 1> tags=[...] scope=[...]
-- <bullet 2> tags=[...]
-- ...
-  (or: Experience: nothing learned)
+# Append policy:
+- Only if there is at least **one** bullet, append to `docs/experience/ledger.md` in this format:
+  `- [YYYY-MM-DDTHH:MM:SSZ] <bullet text>  tags=[...]`
+- Do **not** duplicate bullets already present (do a quick text search).
+- Never include secrets, keys, tokens, or URLs with credentials.
