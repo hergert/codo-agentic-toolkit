@@ -7,9 +7,6 @@ type File struct {
 
 // Allowed stack keys returned by the TUI/flags.
 var allowedStacks = []string{
-	"cloudflare-workers",
-	"supabase",
-	"trigger.dev",
 	"go",
 	"typescript",
 	"python",

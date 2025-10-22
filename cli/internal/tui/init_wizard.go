@@ -21,9 +21,6 @@ type option struct {
 }
 
 var opts = []option{
-	{Key: "cloudflare-workers", Label: "Cloudflare Workers (wrangler)"},
-	{Key: "supabase", Label: "Supabase (DB & functions)"},
-	{Key: "trigger.dev", Label: "trigger.dev (background jobs)"},
 	{Key: "go", Label: "Go"},
 	{Key: "typescript", Label: "TypeScript / Node"},
 	{Key: "python", Label: "Python"},

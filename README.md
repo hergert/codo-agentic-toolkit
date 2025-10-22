@@ -29,7 +29,7 @@ codo completion bash|zsh|fish|powershell > <your-shell-completions-dir>
 codo init
 
 # headless init (skip TUI)
-codo init --stacks "cloudflare-workers,go"
+codo init --stacks "go,typescript"
 
 # update (safe: only overwrites clean files; diverged files → *.codo.new)
 codo update

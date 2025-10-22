@@ -29,8 +29,6 @@
       "Edit(/internal/**)",
       "Edit(/cmd/**)",
       "Edit(/pkg/**)",
-      "Bash(npx wrangler deploy:*)",
-      "Bash(wrangler deploy:*)",
       "WebFetch",
       "WebSearch"
     ],

@@ -15,7 +15,7 @@ Project Tag: CODO-ANCHOR
 9. STOP adding complexity - No extra features unless explicitly requested.
 10. Contract-level testing only - Test public APIs/critical edge-cases/safety invariants; skip language guarantees & private internals.
 11. NEVER commit changes - Do NOT commit unless the user explicitly asks. The user commits.
-12. NEVER deploy to production - Cloudflare Workers: use `npx wrangler deploy` (dev) by default. `--env production` only when explicitly requested.
+12. NEVER deploy to production - deployments require explicit human approval.
 
 ## Default loop
 
