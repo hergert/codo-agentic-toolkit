@@ -29,6 +29,9 @@ jobs:
           cache: true
           cache-dependency-path: cli/go.sum
 
+      - name: Refresh embedded pack
+        run: ./scripts/embed-pack.sh
+
       - name: Verify build
         working-directory: cli
         run: go build ./...
@@ -55,9 +58,6 @@ jobs:
           path: |
             cli/dist/**/*
           if-no-files-found: ignore
-
-      - name: Refresh embedded pack
-        run: ./scripts/embed-pack.sh
 
       - name: Package pack for dev build
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
