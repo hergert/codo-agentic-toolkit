@@ -71,10 +71,8 @@ jobs:
           cache: true
           cache-dependency-path: cli/go.sum
 
-      - name: Prepare embedded pack & smoke build
-        run: |
-          ./scripts/embed-pack.sh
-          go -C cli build -o /tmp/codo .
+      - name: Verify build
+        run: go -C cli build -o /tmp/codo .
 
       - name: Run GoReleaser (tagged release)
         uses: goreleaser/goreleaser-action@v6
